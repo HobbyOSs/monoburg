@@ -1117,6 +1117,7 @@ main (int argc, char *argv [])
 
 	for (i = 1; i < argc; i++){
 		if (argv [i][0] == '-'){
+			/* Short options */
 			if (argv [i][1] == 'h') {
 				usage ();
 			} else if (argv [i][1] == 'e') {
@@ -1132,8 +1133,15 @@ main (int argc, char *argv [])
 			} else if (argv [i][1] == 'D') {
                                 g_hash_table_insert (definedvars, &argv [i][2],
                                                      GUINT_TO_POINTER (1));
-			} else if (argv [i][1] == 'g') {
-				with_glib = FALSE;
+			} else if (argv [i][1] == '-') {
+
+				/* Long options */
+				if (strcmp(argv [i] + 2, "without-glib") == 0) {
+					with_glib = FALSE;
+				} else {
+					usage ();
+				}
+
 			} else {
 				usage ();
 			}
