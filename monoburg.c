@@ -28,6 +28,7 @@ static FILE *deffd;
 static FILE *cfd;
 
 static gboolean with_glib = TRUE;
+static gboolean with_debug_tables = TRUE;
 static int dag_mode = 0;
 static int predefined_terms = 0;
 static int default_cost = 0;
@@ -967,24 +968,28 @@ emit_vardefs ()
 		}
 		output ("};\n\n");
 
-		output ("const char *const mono_burg_term_string [] = {\n");
+		if (with_debug_tables) {
+			output ("const char *const mono_burg_term_string [] = {\n");
+			output ("\tNULL,\n");
+			for (l = term_list, i = 0; l; l = l->next) {
+				Term *t = (Term *)l->data;
+				output ("\t\"%s\",\n", t->name);
+			}
+			output ("};\n\n");
+		}
+	}
+
+	if (with_debug_tables) {
+		output ("const char * const mono_burg_rule_string [] = {\n");
 		output ("\tNULL,\n");
-		for (l = term_list, i = 0; l; l = l->next) {
-			Term *t = (Term *)l->data;
-			output ("\t\"%s\",\n", t->name);
+		for (l = rule_list, i = 0; l; l = l->next) {
+			Rule *rule = (Rule *)l->data;
+			output ("\t\"%s: ", rule->lhs->name);
+			emit_tree_string (rule->tree);
+			output ("\",\n");
 		}
 		output ("};\n\n");
 	}
-
-	output ("const char * const mono_burg_rule_string [] = {\n");
-	output ("\tNULL,\n");
-	for (l = rule_list, i = 0; l; l = l->next) {
-		Rule *rule = (Rule *)l->data;
-		output ("\t\"%s: ", rule->lhs->name);
-		emit_tree_string (rule->tree);
-		output ("\",\n");
-	}
-	output ("};\n\n");
 
 	n = g_list_length (rule_list);
 	sa = g_new0 (char *, n);
@@ -1024,9 +1029,11 @@ emit_prototypes ()
 		output ("typedef void (*MBEmitFunc) (MBState *state, MBTREE_TYPE *tree, MBCGEN_TYPE *s);\n\n");
 	else
 		output ("typedef void (*MBEmitFunc) (MBTREE_TYPE *tree, MBCGEN_TYPE *s);\n\n");
-	
-	output ("extern const char * const mono_burg_term_string [];\n");
-	output ("extern const char * const mono_burg_rule_string [];\n");
+
+	if (with_debug_tables) {
+		output ("extern const char * const mono_burg_term_string [];\n");
+		output ("extern const char * const mono_burg_rule_string [];\n");
+	}
 	output ("extern const guint16 *const mono_burg_nts [];\n");
 	output ("extern MBEmitFunc const mono_burg_func [];\n");
 
@@ -1138,6 +1145,8 @@ main (int argc, char *argv [])
 				/* Long options */
 				if (strcmp(argv [i] + 2, "without-glib") == 0) {
 					with_glib = FALSE;
+				} else if (strcmp(argv [i] + 2, "without-debug-tables") == 0) {
+					with_debug_tables = FALSE;
 				} else {
 					usage ();
 				}
