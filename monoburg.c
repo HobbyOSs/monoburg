@@ -266,15 +266,26 @@ term_compare_func (Term *t1, Term *t2)
 }
 
 static void
-emit_header ()
+emit_includes ()
 {
-	GList *l;
-
 	if (with_glib) {
 		output ("#include <glib.h>\n");
 		output ("\n");
 	}
 	else {
+		output ("# include <stdio.h>\n");
+		output ("# include <stdlib.h>\n");
+		output ("# include <stdarg.h>\n");
+		output ("# include <assert.h>\n");
+	}
+}
+
+static void
+emit_header ()
+{
+	GList *l;
+
+	if (!with_glib) {
 		output ("#ifndef guint8\n");
 		output ("# define guint8 unsigned char\n");
 		output ("#endif /* !guint8 */\n");
@@ -285,11 +296,6 @@ emit_header ()
 		output ("# define gpointer void*\n");
 		output ("#endif /* !gpointer */\n");
 		output ("\n");
-
-		output ("#if !defined(g_new) || !defined(g_new0)\n");
-		output ("# include <stdio.h>\n");
-		output ("# include <stdlib.h>\n");
-		output ("#endif /* !defined(g_new) || !defined(g_new0) */\n");
 
 		output ("#ifndef g_new\n");
 		output ("static void *\n");
@@ -324,11 +330,6 @@ emit_header ()
 		output ("#define g_new0(struct_type, n_structs) ((struct_type *) mono_burg_xcalloc_(1, sizeof(struct_type) * n_structs))\n");
 		output ("#endif /* !g_new0 */\n");
 		output ("\n");
-
-		output ("#if !defined(g_error) || !defined(g_warning)\n");
-		output ("# include <stdio.h>\n");
-		output ("# include <stdarg.h>\n");
-		output ("#endif /* !defined(g_error) || !defined(g_warning) */\n");
 
 		output ("#ifndef g_error\n");
 		output ("static int\n");
@@ -366,7 +367,6 @@ emit_header ()
 		output ("\n");
 
 		output ("#ifndef g_assert\n");
-		output ("# include <assert.h>\n");
 		output ("# define g_assert assert\n");
 		output ("#endif /* !g_assert */\n");
 		output ("\n");
@@ -1170,6 +1170,7 @@ main (int argc, char *argv [])
 	} else 
 		outputfd = stdout;
 
+	emit_includes ();
 
 	if (infiles) {
 		GList *l = infiles;

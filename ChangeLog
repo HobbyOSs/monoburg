@@ -1,5 +1,9 @@
 2004-11-07  Benoit Perrot <benoit@lrde.epita.fr>
 
+	* monoburg.c (emit_header): Extract includes emission.
+
+2004-11-07  Benoit Perrot <benoit@lrde.epita.fr>
+
 	* monoburg.c (emit_state): Do not forward define MBState type. 
 	
 2004-11-07  Benoit Perrot <benoit@lrde.epita.fr>
