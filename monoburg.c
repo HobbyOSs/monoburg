@@ -441,7 +441,6 @@ emit_state ()
 	GList *l;
 	int i, j;
 
-	output ("typedef struct _MBState MBState;\n");
 	output ("struct _MBState {\n");
 	output ("\tint\t\t op;\n");
 
@@ -450,7 +449,7 @@ emit_state ()
 		output ("\tgint32 reg1, reg2;\n");
 	}
 	
-	output ("\tMBState\t\t*left, *right;\n");
+	output ("\tstruct _MBState\t\t*left, *right;\n");
 	output ("\tguint16\t\tcost[%d];\n", g_list_length (nonterm_list) + 1);
 
 	for (l = nonterm_list; l; l = l->next) {
@@ -463,6 +462,7 @@ emit_state ()
 		output ("\tunsigned int\t rule_%s:%d;\n",  n->name, j); 
 	}
 	output ("};\n\n");
+	output ("typedef struct _MBState MBState;\n");
 }
 
 static void
