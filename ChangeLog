@@ -1,3 +1,8 @@
+2004-10-13  Benoit Perrot <benoit@lrde.epita.fr>
+
+	* monoburg.c: Emit code to generate a file that does not need glib to 
+	compile. Add `-g' option to control this emission.
+
 2004-10-06  Benoit Perrot <benoit@lrde.epita.fr>
 
 	* monoburg.y: Rename to...

@@ -27,6 +27,7 @@ GHashTable *definedvars;
 static FILE *deffd;
 static FILE *cfd;
 
+static gboolean with_glib = TRUE;
 static int dag_mode = 0;
 static int predefined_terms = 0;
 static int default_cost = 0;
@@ -268,8 +269,113 @@ emit_header ()
 {
 	GList *l;
 
-	output ("#include <glib.h>\n");
-	output ("\n");
+	if (with_glib) {
+		output ("#include <glib.h>\n");
+		output ("\n");
+	}
+	else {
+		output ("#ifndef guint8\n");
+		output ("# define guint8 unsigned char\n");
+		output ("#endif /* !guint8 */\n");
+		output ("#ifndef guint16\n");
+		output ("# define guint16 unsigned short\n");
+		output ("#endif /* !guint16 */\n");
+		output ("#ifndef gpointer\n");
+		output ("# define gpointer void*\n");
+		output ("#endif /* !gpointer */\n");
+		output ("\n");
+
+		output ("#ifndef g_new\n");
+		output ("static void *\n");
+		output ("mono_burg_xmalloc_ (size_t size)\n");
+		output ("{\n");
+		output ("	void *p;\n");
+		output ("\n");
+		output ("	p = malloc (size);\n");
+		output ("	if (!p) {\n");
+		output ("		fprintf (stderr, \"Not enough memory\\n\");\n");
+		output ("		exit (1);\n");
+		output ("	}\n");
+		output ("	return p;\n");
+		output ("}\n");
+		output ("# define g_new(struct_type, n_structs) ((struct_type *) mono_burg_xmalloc_ (sizeof(struct_type) * n_structs))\n");
+		output ("#endif /* !g_new */\n");
+		output ("\n");
+
+		output ("#ifndef g_new0\n");
+		output ("static void *\n");
+		output ("mono_burg_xcalloc_ (size_t nmemb, size_t size)\n");
+		output ("{\n");
+		output ("	void *p;\n");
+		output ("\n");
+		output ("	p = calloc (nmemb, size);\n");
+		output ("	if (!p) {\n");
+		output ("		fprintf (stderr, \"Not enough memory\\n\");\n");
+		output ("		exit (1);\n");
+		output ("	}\n");
+		output ("	return p;\n");
+		output ("}\n");
+		output ("#define g_new0(struct_type, n_structs) ((struct_type *) mono_burg_xcalloc_(1, sizeof(struct_type) * n_structs))\n");
+		output ("#endif /* !g_new0 */\n");
+		output ("\n");
+
+		output ("#if !defined(g_error) || !defined(g_warning)\n");
+		output ("# include <stdarg.h>\n");
+		output ("#endif /* !defined(g_error) || !defined(g_warning) */\n");
+
+		output ("#ifndef g_error\n");
+		output ("static int\n");
+		output ("mono_burg_error_ (const char *format, ...)\n");
+		output ("{\n");
+		output ("	int n = 0;\n");
+		output ("	va_list ap;\n");
+		output ("\n");
+		output ("	n = fprintf (stderr, \"Error: \");\n");
+		output ("	va_start (ap, format);\n");
+		output ("	n += vfprintf (stderr, format, ap);\n");
+		output ("	va_end (ap);\n");
+		output ("\n");
+		output ("	return n;\n");
+		output ("}\n");
+		output ("# define g_error mono_burg_error_\n");
+		output ("#endif /* !g_error */\n");
+
+		output ("#ifndef g_warning\n");
+		output ("static int\n");
+		output ("mono_burg_warning_ (const char *format, ...)\n");
+		output ("{\n");
+		output ("	int n = 0;\n");
+		output ("	va_list ap;\n");
+		output ("\n");
+		output ("	n = fprintf (stderr, \"Warning: \");\n");
+		output ("	va_start (ap, format);\n");
+		output ("	n += vfprintf (stderr, format, ap);\n");
+		output ("	va_end (ap);\n");
+		output ("\n");
+		output ("	return n;\n");
+		output ("}\n");
+		output ("# define g_warning mono_burg_warning_\n");
+		output ("#endif /* !g_warning */\n");
+		output ("\n");
+
+		output ("#ifndef g_assert\n");
+		output ("# include <assert.h>\n");
+		output ("# define g_assert assert\n");
+		output ("#endif /* !g_assert */\n");
+		output ("\n");
+
+		output ("#ifndef g_return_val_if_fail\n");
+		output ("# ifdef NDEBUG\n");
+		output ("#  define g_return_val_if_fail(expr, val)\n");
+		output ("# else /* !NDEBUG */\n");
+		output ("#  define g_return_val_if_fail(expr, val) do { if (! (expr)) return val; } while (0)\n");
+		output ("# endif /* NDEBUG */\n");
+		output ("#endif /* !g_return_val_if_fail */\n");
+		output ("#ifndef g_assert_not_reached\n");
+		output ("# define g_assert_not_reached(X) assert (!\"Should not be there\")\n");
+		output ("#endif /* !g_assert_not_reached */\n");
+		output ("\n");
+	}
 
 	output ("#ifndef MBTREE_TYPE\n#error MBTREE_TYPE undefined\n#endif\n");
 	output ("#ifndef MBTREE_OP\n#define MBTREE_OP(t) ((t)->op)\n#endif\n");
@@ -1020,6 +1126,8 @@ main (int argc, char *argv [])
 			} else if (argv [i][1] == 'D') {
                                 g_hash_table_insert (definedvars, &argv [i][2],
                                                      GUINT_TO_POINTER (1));
+			} else if (argv [i][1] == 'g') {
+				with_glib = FALSE;
 			} else {
 				usage ();
 			}
