@@ -285,6 +285,11 @@ emit_header ()
 		output ("#endif /* !gpointer */\n");
 		output ("\n");
 
+		output ("#if !defined(g_new) || !defined(g_new0)\n");
+		output ("# include <stdio.h>\n");
+		output ("# include <stdlib.h>\n");
+		output ("#endif /* !defined(g_new) || !defined(g_new0) */\n");
+
 		output ("#ifndef g_new\n");
 		output ("static void *\n");
 		output ("mono_burg_xmalloc_ (size_t size)\n");
@@ -320,6 +325,7 @@ emit_header ()
 		output ("\n");
 
 		output ("#if !defined(g_error) || !defined(g_warning)\n");
+		output ("# include <stdio.h>\n");
 		output ("# include <stdarg.h>\n");
 		output ("#endif /* !defined(g_error) || !defined(g_warning) */\n");
 

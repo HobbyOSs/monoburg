@@ -1,5 +1,10 @@
 2004-10-13  Benoit Perrot <benoit@lrde.epita.fr>
 
+	* monoburg.c: Emit `stdio.h' and `stdlib.h' inclusions when `-g'
+	is specified to kill warnings.
+
+2004-10-13  Benoit Perrot <benoit@lrde.epita.fr>
+
 	* monoburg.c: Emit code to generate a file that does not need glib to 
 	compile. Add `-g' option to control this emission.
 
