@@ -1,0 +1,20 @@
+				MonoBURG
+				********
+General
+=======
+
+* Make monoburg output C++ friendly.
+
+* Fix monoburg scanner (do not use fixed-length strings, etc.).
+
+* Enhance error detection in input.
+
+Suggestions
+===========
+
+* Suggested by Akim Demaille:
+  The macros emited to compensate glib might be grouped in a single string, 
+  defined in an external file `/usr/share/monoburg/monoburg-header.h', then 
+  output by a single call to output().
+
+  This is nicer but it needs an external file to be installed.

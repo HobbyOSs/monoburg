@@ -1,5 +1,9 @@
 2004-10-13  Benoit Perrot <benoit@lrde.epita.fr>
 
+	* TODO: New.
+
+2004-10-13  Benoit Perrot <benoit@lrde.epita.fr>
+
 	* monoburg.c: Emit `stdio.h' and `stdlib.h' inclusions when `-g'
 	is specified to kill warnings.
 
