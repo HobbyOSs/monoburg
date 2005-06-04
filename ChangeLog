@@ -1,5 +1,13 @@
 2005-06-04  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* config.h.in: New.
+	* configure.ac: Output PACKAGE infos in config.h.
+	* monoburg.c: Add `-v' and `--version' options.
+	* Makefile.am: Fix distribution and cleaning rules.
+	* monoburg.h: Include `config.h'.
+
+2005-06-04  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* parser.y:  Add  a  `%include'  directive  which  includes  files
 	verbatim. Syntax is:
 	%include filename

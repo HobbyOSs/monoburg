@@ -18,7 +18,7 @@ monoburg_LDADD =			\
 ## MonoBURG manual
 man_MANS = monoburg.1
 
-EXTRA_DIST = $(man_MANS)
+EXTRA_DIST = ChangeLog $(man_MANS)
 
 ## Check/Sample
 check_PROGRAMS = sample
@@ -31,4 +31,4 @@ sample.c: monoburg$(EXEEXT) $(srcdir)/sample.brg
 sample_SOURCES = sample.brg
 sample_LDADD = sample.o $(GLIB_LIBS)
 
-CLEANFILES = sample.c
+CLEANFILES = sample.c sample.o parser.c

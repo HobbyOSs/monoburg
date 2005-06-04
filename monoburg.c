@@ -1068,9 +1068,9 @@ emit_prototypes ()
 		output ("int mono_burg_rule (MBState *state, int goal);\n");
 
 		if (dag_mode)
-		  output ("MBState **mono_burg_kids (MBState *state, int rulenr, MBState *kids []);\n");
+			output ("MBState **mono_burg_kids (MBState *state, int rulenr, MBState *kids []);\n");
 		else
-		  output ("MBTREE_TYPE **mono_burg_kids (MBTREE_TYPE *tree, int rulenr, MBTREE_TYPE *kids []);\n");
+			output ("MBTREE_TYPE **mono_burg_kids (MBTREE_TYPE *tree, int rulenr, MBTREE_TYPE *kids []);\n");
 
 		output ("extern void mono_burg_init (void);\n");
 	}
@@ -1142,6 +1142,14 @@ usage ()
 	exit (1);
 }
 
+
+static void
+version ()
+{
+	printf ("%s\n", PACKAGE_STRING);
+	exit (0);
+}
+
 static void
 warning_handler (const gchar *log_domain,
 		 GLogLevelFlags log_level,
@@ -1169,6 +1177,8 @@ main (int argc, char *argv [])
 			/* Short options */
 			if (argv [i][1] == 'h') {
 				usage ();
+			} else if (argv [i][1] == 'v') {
+				version ();
 			} else if (argv [i][1] == 'e') {
 				dag_mode = 1;
 			} else if (argv [i][1] == 'p') {
@@ -1187,9 +1197,11 @@ main (int argc, char *argv [])
 				/* Long options */
 				if (strcmp (argv [i] + 2, "without-glib") == 0) {
 					with_glib = FALSE;
-				} else if (strcmp (argv [i] + 2, "without-exported-symbols") == 0) {
+				} else if (strcmp(argv [i] + 2, "version") == 0) {
+					version ();
+				} else if (strcmp(argv [i] + 2, "without-exported-symbols") == 0) {
 					with_exported_symbols = FALSE;
-				} else if (strcmp (argv [i] + 2, "with-references") == 0) {
+				} else if (strcmp(argv [i] + 2, "with-references") == 0) {
 					warn_cpp ("`--with-references' option");
 					with_references = TRUE;
 				} else {

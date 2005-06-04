@@ -1,6 +1,7 @@
 #ifndef __MONO_MONOBURG_H__
 #define __MONO_MONOBURG_H__
 
+#include <config.h>
 #include <glib.h>
 
 #define MAX_FDS 10
