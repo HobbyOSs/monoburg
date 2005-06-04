@@ -258,6 +258,7 @@ yyparsetail (void)
   fputs (input, outputfd);
   while (fgets (input, sizeof (input), inputfd))
     fputs (input, outputfd);
+  input[0] = '\0';
 }
 
 int 
