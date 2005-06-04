@@ -1,5 +1,18 @@
 2005-06-04  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* monoburg.c:  Add   a  `--with-references'   option  which  makes
+	monoburg to  produce `mono_burg_emit_*' functions  that takes tree
+	as a `MBTREE&'.
+	
+	The user is warned that the code produced will only be compilable
+	with a C++ compiler.
+	
+	* monoburg.c (emit_emmitter_func): Add fake use of arguments of 
+	`emit' functions produced to avoid `unused parameter' warning when
+	compiling output.
+
+2005-06-04  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* parser.y:  Add an optional `;' at  the end of an  empty rule, in
 	the style of yacc(1).
 

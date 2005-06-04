@@ -29,6 +29,7 @@ static FILE *cfd;
 
 static gboolean with_glib = TRUE;
 static gboolean with_exported_symbols = TRUE;
+static gboolean with_references = FALSE;
 static int dag_mode = 0;
 static int predefined_terms = 0;
 static int default_cost = 0;
@@ -842,11 +843,17 @@ emit_emitter_func ()
 			emit_rule_string (rule, "");
 
 			if (dag_mode)
-				output ("mono_burg_emit_%d (MBState *state, MBTREE_TYPE *tree, MBCGEN_TYPE *s)\n", i);
+				output ("mono_burg_emit_%d (MBState *state, MBTREE_TYPE %ctree, MBCGEN_TYPE *s)\n", i,
+					  (with_references ? '&' : '*'));
 			else
-				output ("mono_burg_emit_%d (MBTREE_TYPE *tree, MBCGEN_TYPE *s)\n", i);
+				output ("mono_burg_emit_%d (MBTREE_TYPE %ctree, MBCGEN_TYPE *s)\n", i,
+					(with_references ? '&' : '*'));
+
 			output ("{\n");
-			output ("%s\n", rule->code);
+			output ("(void) tree; (void) s;");
+			if (dag_mode)
+				output (" (void) state;");
+			output ("\n%s\n", rule->code);
 			output ("}\n\n");
 			g_hash_table_insert (cache, rule->code, GINT_TO_POINTER (i));
 		}
@@ -1042,9 +1049,11 @@ static void
 emit_prototypes ()
 {
 	if (dag_mode)
-		output ("typedef void (*MBEmitFunc) (MBState *state, MBTREE_TYPE *tree, MBCGEN_TYPE *s);\n\n");
+		output ("typedef void (*MBEmitFunc) (MBState *state, MBTREE_TYPE %ctree, MBCGEN_TYPE *s);\n\n",
+			(with_references ? '&' : '*'));
 	else
-		output ("typedef void (*MBEmitFunc) (MBTREE_TYPE *tree, MBCGEN_TYPE *s);\n\n");
+		output ("typedef void (*MBEmitFunc) (MBTREE_TYPE %ctree, MBCGEN_TYPE *s);\n\n",
+			(with_references ? '&' : '*'));
 
 	if (with_exported_symbols) {
 		output ("extern const char * const mono_burg_term_string [];\n");
@@ -1110,6 +1119,18 @@ check_result ()
 	}
 }
 
+void
+warn_cpp (const gchar *use_of)
+{
+	static int b_said = FALSE;
+
+	if (!b_said) {
+		g_warning ("using %s will lead to produce C++ only code",
+			   use_of);
+		b_said = TRUE;
+	}
+}
+
 static void
 usage ()
 {
@@ -1165,6 +1186,9 @@ main (int argc, char *argv [])
 					with_glib = FALSE;
 				} else if (strcmp (argv [i] + 2, "without-exported-symbols") == 0) {
 					with_exported_symbols = FALSE;
+				} else if (strcmp (argv [i] + 2, "with-references") == 0) {
+					warn_cpp  ("`--with-references' option");
+					with_references = TRUE;
 				} else {
 					usage ();
 				}
