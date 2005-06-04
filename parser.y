@@ -70,6 +70,7 @@ rule_list : rule { $$ = g_list_append (NULL, $1); }
 	;
 
 optcode : /* empty */ { $$ = NULL; }
+	| ';' { $$ = NULL; }
 	| CODE 
 	;
 
