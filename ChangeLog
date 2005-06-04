@@ -1,5 +1,12 @@
 2005-06-04  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* monoburg.c: Add a `--without-exported-symbols' option which
+	makes monoburg avoid defining external symbols as much as
+	possible.
+	Remove the weaker `--without-debug-tables'.
+
+2005-06-04  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* parser.y: Update according to mono-project repository.
 	* monoburg.vcproj: New. Add according to mono-project repository.
 
