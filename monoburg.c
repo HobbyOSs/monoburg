@@ -21,7 +21,7 @@ static GList *nonterm_list;
 static GList *rule_list;
 static GList *prefix_list;
 
-FILE *inputfd;
+File inputs[MAX_FDS];
 FILE *outputfd;
 GHashTable *definedvars;
 static FILE *deffd;
@@ -1217,24 +1217,27 @@ main (int argc, char *argv [])
 
 	emit_includes ();
 
+	inputs[0].yylineno = 0;
 	if (infiles) {
 		GList *l = infiles;
 		while (l) {
 			char *infile = (char *)l->data;
-			if (!(inputfd = fopen (infile, "r"))) {
+			if (!(inputs[0].fd = fopen (infile, "r"))) {
 				perror ("cant open input file");
 				exit (-1);
 			}
+			inputs[0].filename = infile;
 
 			yyparse ();
 
 			reset_parser ();
 
-			l->data = inputfd;
+			l->data = inputs[0].fd;
 			l = l->next;
 		}
 	} else {
-		inputfd = stdin;
+		inputs[0].fd = stdin;
+		inputs[0].filename = "stdin";
 		yyparse ();
 	}
 
@@ -1288,9 +1291,9 @@ main (int argc, char *argv [])
 	if (infiles) {
 		GList *l = infiles;
 		while (l) {
-			inputfd = l->data;
+			inputs[0].fd = l->data;
 			yyparsetail ();
-			fclose (inputfd);
+			fclose (inputs[0].fd);
 			l = l->next;
 		}
 	} else {

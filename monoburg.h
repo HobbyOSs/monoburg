@@ -3,12 +3,13 @@
 
 #include <glib.h>
 
+#define MAX_FDS 10
+#define MAX_FILENAME_LEN 100
 #define MAX_NAMESPACES 10
 
 void yyerror (char *fmt, ...);
 int  yylex   (void);
 
-extern FILE *inputfd;
 extern FILE *outputfd;
 extern GHashTable *definedvars;
 extern char *namespaces[MAX_NAMESPACES];
@@ -50,6 +51,17 @@ struct _Rule {
 	char *cost;
 	char *cfunc;
 };
+
+typedef struct _File File;
+
+struct _File {
+	int yylineno;
+	int yylinepos;
+	char *filename;
+	FILE *fd;
+};
+
+extern File inputs[MAX_FDS];
 
 
 Tree    *create_tree    (char *id, Tree *left, Tree *right);

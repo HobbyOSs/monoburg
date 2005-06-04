@@ -15,11 +15,9 @@
 #include <ctype.h>
 #include <assert.h>
 #include <stdarg.h>
+#include <errno.h>
 
 #include "monoburg.h"
-
-static int yylineno = 0;
-static int yylinepos = 0;
 
 %}
 
@@ -79,7 +77,7 @@ rule_list : rule { $$ = g_list_append (NULL, $1); }
 
 optcode : /* empty */ { $$ = NULL; }
 	| ';' { $$ = NULL; }
-	| CODE 
+	| CODE
 	;
 
 plist	: /* empty */
@@ -108,6 +106,45 @@ optcfunc : /*empty */ { $$ = NULL; }
 
 static char input[2048];
 static char *next = input;
+static int n_input = 0;
+
+char *fgets_inc(char *s, int size)
+{
+  int n_length;
+  char filename[MAX_FILENAME_LEN];
+
+  /* 9 == strlen("%include "); */
+  assert (size > 9 + MAX_FILENAME_LEN);
+
+  if (fgets (s, size, inputs[n_input].fd) == NULL) {
+    if (n_input == 0)
+      return 0;
+    free (inputs[n_input].filename);
+    fclose (inputs[n_input--].fd);
+    return fgets_inc(s, size);
+  }
+
+  inputs[n_input].yylineno++;
+  inputs[n_input].yylinepos = 1;
+
+  n_length = strlen(s);
+  if (strncmp (s, "%include ", 9) == 0) {
+    if (n_input == MAX_FDS - 1)
+      yyerror ("maximum include depth exceeded");
+    if (n_length - 9 > MAX_FILENAME_LEN)
+      yyerror ("`%%include' is referring to a too long filename");
+    if (s[n_length - 1] == '\n')
+      s[n_length - 1] = 0;
+    strcpy (filename, s + 9);
+    if (!(inputs[n_input + 1].fd = fopen (filename, "r")))
+      yyerror ("`%%include %s': %s",
+	       filename, strerror(errno));
+    inputs[++n_input].yylineno = 0;
+    inputs[n_input].filename = strdup (filename);
+    return fgets_inc(s, size);
+  }
+  return s;
+}
 
 void
 yyerror (char *fmt, ...)
@@ -115,8 +152,9 @@ yyerror (char *fmt, ...)
   va_list ap;
 
   va_start(ap, fmt);
-
-  fprintf (stderr, "line %d(%d): ", yylineno, yylinepos);
+  fprintf (stderr, "%s: line %d(%d): ",
+	   inputs[n_input].filename,
+	   inputs[n_input].yylineno, inputs[n_input].yylinepos);
   vfprintf (stderr, fmt, ap);
   fprintf(stderr, "\n");
 
@@ -201,7 +239,7 @@ nextchar ()
       next = input;
       *next = 0;
       do {
-	if (!fgets (input, sizeof (input), inputfd))
+	if (!fgets_inc (input, sizeof (input)))
 	  return 0;
 
 	ll = (input[0] == '%' && input[1] == '%');
@@ -254,7 +292,6 @@ nextchar ()
 	}
 	ll = state != 1 || input[0] == '#';
 	state = next_state;
-	yylineno++;
       } while (next_state == 2 || ll);
     }
 
@@ -265,9 +302,8 @@ void
 yyparsetail (void)
 {
   fputs (input, outputfd);
-  while (fgets (input, sizeof (input), inputfd))
+  while (fgets_inc (input, sizeof (input)))
     fputs (input, outputfd);
-  input[0] = '\0';
 }
 
 int
@@ -280,7 +316,7 @@ yylex (void)
     if (!(c = nextchar ()))
       return 0;
 
-    yylinepos = next - input + 1;
+    inputs[n_input].yylinepos = next - input;
 
     if (isspace (c))
       continue;

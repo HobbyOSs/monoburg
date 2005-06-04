@@ -1,5 +1,20 @@
 2005-06-04  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* parser.y:  Add  a  `%include'  directive  which  includes  files
+	verbatim. Syntax is:
+	%include filename
+	without double quote or anything.
+	
+	This directive could be used anywhere.
+	
+	* parser.y (yyerror):   Enhance    verbosity   on   error  message
+	accordingly.
+
+	* monoburg.h: Add the info about included file storage.
+	* monoburg.c: Update accordingly use of `inputfd'.
+
+2005-06-04  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* parser.y: Add  a  `%namespace' directive   which makes  monoburg
 	output  functions in  a  namespace. This  directive could  produce
 	nested namespaces. Syntax is:
