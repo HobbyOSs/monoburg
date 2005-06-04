@@ -195,27 +195,27 @@ nextchar ()
 	if (!fgets (input, sizeof (input), inputfd))
 	  return 0;
 
-	ll = (input [0] == '%' && input [1] == '%');
+	ll = (input[0] == '%' && input[1] == '%');
 	next_state = state;
 
         if (state == 1) {
-          if (!ll && input [0] == '%') {
-            if (!strncmp (&input [1], "ifdef", 5)) {
-              push_if (&input [6], FALSE);
+          if (!ll && input[0] == '%') {
+            if (!strncmp (&input[1], "ifdef", 5)) {
+              push_if (&input[6], FALSE);
               ll = TRUE;
               continue;
             }
-            else if (!strncmp (&input [1], "ifndef", 6)) {
-              push_if (&input [7], TRUE);
+            else if (!strncmp (&input[1], "ifndef", 6)) {
+              push_if (&input[7], TRUE);
               ll = TRUE;
               continue;
             }
-            else if (!strncmp (&input [1], "else", 4)) {
+            else if (!strncmp (&input[1], "else", 4)) {
               flip_if ();
               ll = TRUE;
               continue;
             }
-            else if (!strncmp (&input [1], "endif", 5)) {
+            else if (!strncmp (&input[1], "endif", 5)) {
               pop_if ();
               ll = TRUE;
               continue;
@@ -258,6 +258,7 @@ yyparsetail (void)
   fputs (input, outputfd);
   while (fgets (input, sizeof (input), inputfd))
     fputs (input, outputfd);
+  input[0] = '\0';
 }
 
 int 
