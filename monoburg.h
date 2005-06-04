@@ -3,12 +3,16 @@
 
 #include <glib.h>
 
+#define MAX_NAMESPACES 10
+
 void yyerror (char *fmt, ...);
 int  yylex   (void);
 
 extern FILE *inputfd;
 extern FILE *outputfd;
 extern GHashTable *definedvars;
+extern char *namespaces[MAX_NAMESPACES];
+extern int n_namespace;
 
 typedef struct _Rule Rule;
 
@@ -62,8 +66,10 @@ Rule    *make_rule      (char *id, Tree *tree);
 
 void     rule_add       (Rule *rule, char *code, char *cost, char *cfunc);
 
-void     create_rule    (char *id, Tree *tree, char *code, char *cost, 
+void     create_rule    (char *id, Tree *tree, char *code, char *cost,
 			 char *cfunc);
+
+void     warn_cpp       (const gchar *use_of);
 
 void     yyparsetail    (void);
 

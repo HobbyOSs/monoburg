@@ -17,7 +17,7 @@
 #include <stdarg.h>
 
 #include "monoburg.h"
-  
+
 static int yylineno = 0;
 static int yylinepos = 0;
 
@@ -38,6 +38,7 @@ static int yylinepos = 0;
 %token  COST
 %token  TERM
 %token  TERMPREFIX
+%token  NAMESPACE
 %token <ivalue> INTEGER
 
 %type   <tree>          tree
@@ -49,10 +50,17 @@ static int yylinepos = 0;
 
 %%
 
-decls   : /* empty */ 
+decls   : /* empty */
 	| START IDENT { start_nonterm ($2); } decls
 	| TERM  tlist decls
 	| TERMPREFIX plist decls
+	| NAMESPACE IDENT {
+			warn_cpp ("`%namespace' directive");
+			if (n_namespace == MAX_NAMESPACES)
+				yyerror ("maximum namespace depth reached.");
+			else
+				namespaces[n_namespace++] = g_strdup($2);
+		} decls
 	| rule_list optcost optcode optcfunc {
 			GList *tmp;
 			for (tmp = $1; tmp; tmp = tmp->next) {
@@ -101,7 +109,7 @@ optcfunc : /*empty */ { $$ = NULL; }
 static char input[2048];
 static char *next = input;
 
-void 
+void
 yyerror (char *fmt, ...)
 {
   va_list ap;
@@ -232,7 +240,7 @@ nextchar ()
 	case 0:
 	  if (ll) {
 	    next_state = 1;
-	  } else 
+	  } else
 	    fputs (input, outputfd);
 	  break;
 	case 1:
@@ -248,7 +256,7 @@ nextchar ()
 	state = next_state;
 	yylineno++;
       } while (next_state == 2 || ll);
-    } 
+    }
 
     return *next++;
 }
@@ -262,8 +270,8 @@ yyparsetail (void)
   input[0] = '\0';
 }
 
-int 
-yylex (void) 
+int
+yylex (void)
 {
   char c;
 
@@ -292,6 +300,12 @@ yylex (void)
 	next += 4;
 	return TERM;
       }
+
+      if (!strncmp (next, "namespace", 9) && isspace (next[9])) {
+	next += 9;
+	return NAMESPACE;
+      }
+
       return c;
     }
 
@@ -315,7 +329,7 @@ yylex (void)
 	return COST;
       }
 
-      while (isalpha (*n) || isdigit (*n) || *n == '_') 
+      while (isalpha (*n) || isdigit (*n) || *n == '_')
 	      n++;
 
       l = n - next + 1;
@@ -323,14 +337,14 @@ yylex (void)
       next = n;
       return IDENT;
     }
-    
+
     if (c == '"') {
       int i = 0;
       static char buf [100000];
- 
+
       while ((c = *next++) != '"' && c)
 	buf [i++] = c;
-      
+
       buf [i] = '\0';
       yylval.text = g_strdup (buf);
 
@@ -338,9 +352,9 @@ yylex (void)
     }
 
     if (c == '{') {
-      int i = 0, d = 1;
+      unsigned i = 0, d = 1;
       static char buf [100000];
- 
+
       while (d && (c = nextchar ())) {
 	buf [i++] = c;
 	assert (i < sizeof (buf));
@@ -357,9 +371,9 @@ yylex (void)
 
       return CODE;
     }
-    
+
     return c;
-  
+
   } while (1);
 }
 

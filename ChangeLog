@@ -1,5 +1,26 @@
 2005-06-04  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* parser.y: Add  a  `%namespace' directive   which makes  monoburg
+	output  functions in  a  namespace. This  directive could  produce
+	nested namespaces. Syntax is:
+	%namespace namespace1_name
+	%namespace namespace2_name
+	without double quote or anything.
+	
+	This directive  can only be  used in the  `rule' part of  the burg
+	file.
+
+	The user is warned that  the code produced will only be compilable
+	with a C++ compiler.
+	
+	* parser.y (yylex):  Remove  a warning  when comparing  a `sizeof'
+	with an int.
+	
+	* monoburg.c,
+	* monoburg.h: Add `%namespace' handling.
+
+2005-06-04  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* monoburg.c:  Add   a  `--with-references'   option  which  makes
 	monoburg to  produce `mono_burg_emit_*' functions  that takes tree
 	as a `MBTREE&'.

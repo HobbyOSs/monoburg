@@ -34,6 +34,9 @@ static int dag_mode = 0;
 static int predefined_terms = 0;
 static int default_cost = 0;
 
+char *namespaces[MAX_NAMESPACES];
+int n_namespace = 0;
+
 static void output (char *fmt, ...)
 {
 	va_list ap;
@@ -1187,7 +1190,7 @@ main (int argc, char *argv [])
 				} else if (strcmp (argv [i] + 2, "without-exported-symbols") == 0) {
 					with_exported_symbols = FALSE;
 				} else if (strcmp (argv [i] + 2, "with-references") == 0) {
-					warn_cpp  ("`--with-references' option");
+					warn_cpp ("`--with-references' option");
 					with_references = TRUE;
 				} else {
 					usage ();
@@ -1241,9 +1244,13 @@ main (int argc, char *argv [])
 		g_error ("no start symbol found");
 
 	emit_header ();
+	for (i = 0; i < n_namespace; ++i)
+	  output ("namespace %s {\n", namespaces[i]);
 	emit_nonterm ();
 	emit_state ();
 	emit_prototypes ();
+	for (i = 0; i < n_namespace; ++i)
+	  output ("}\n");
 
 	if (deffd) {
 		output ("#endif /* _MONO_BURG_DEFS_ */\n");
@@ -1264,6 +1271,8 @@ main (int argc, char *argv [])
 		output ("#include \"%s\"\n\n", deffile);
 	}
 
+	for (i = 0; i < n_namespace; ++i)
+	  output ("namespace %s {\n", namespaces[i]);
 	emit_vardefs ();
 	emit_cost_func ();
 	emit_emitter_func ();
@@ -1273,6 +1282,8 @@ main (int argc, char *argv [])
 	emit_label_func ();
 
 	emit_kids ();
+	for (i = 0; i < n_namespace; ++i)
+	  output ("}\n");
 
 	if (infiles) {
 		GList *l = infiles;
