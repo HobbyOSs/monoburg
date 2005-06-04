@@ -28,12 +28,12 @@ static FILE *deffd;
 static FILE *cfd;
 
 static gboolean with_glib = TRUE;
-static gboolean with_exported_symbols = TRUE;
+static gboolean with_debug_tables = TRUE;
 static int dag_mode = 0;
 static int predefined_terms = 0;
 static int default_cost = 0;
 
-static void output (char *fmt, ...)
+static void output (char *fmt, ...) 
 {
 	va_list ap;
 
@@ -80,11 +80,11 @@ rule_add (Rule *rule, char *code, char *cost, char *cfunc)
 
 	if (rule->tree->op)
 		rule->tree->op->rules = g_list_append (rule->tree->op->rules, rule);
-	else
+	else 
 		rule->tree->nonterm->chain = g_list_append (rule->tree->nonterm->chain, rule);
 }
 
-void
+void     
 create_rule (char *id, Tree *tree, char *code, char *cost, char *cfunc)
 {
 	Rule *rule = make_rule (id, tree);
@@ -96,7 +96,7 @@ Tree *
 create_tree (char *id, Tree *left, Tree *right)
 {
 	int arity = (left != NULL) + (right != NULL);
-	Term *term = NULL;
+	Term *term = NULL; 
 	Tree *tree = g_new0 (Tree, 1);
 
 	if (term_hash)
@@ -139,8 +139,8 @@ check_term_num (char *key, Term *value, int num)
 	if (num != -1 && value->number == num)
 		yyerror ("duplicate terminal id \"%s\"", key);
 }
-
-void
+ 
+void  
 create_term_prefix (char *id)
 {
 	if (!predefined_terms)
@@ -160,7 +160,7 @@ create_term (char *id, int num)
 	if (num < -1)
 		yyerror ("invalid terminal number %d", num);
 
-	if (!term_hash)
+	if (!term_hash) 
 		term_hash = g_hash_table_new (g_str_hash , g_str_equal);
 
 	g_hash_table_foreach (term_hash, (GHFunc) check_term_num, (gpointer) num);
@@ -183,7 +183,7 @@ nonterm (char *id)
 {
 	NonTerm *nterm;
 
-	if (!nonterm_hash)
+	if (!nonterm_hash) 
 		nonterm_hash = g_hash_table_new (g_str_hash , g_str_equal);
 
 	if ((nterm = g_hash_table_lookup (nonterm_hash, id)))
@@ -194,7 +194,7 @@ nonterm (char *id)
 	nterm->name = g_strdup (id);
 	nonterm_list = g_list_append (nonterm_list, nterm);
 	nterm->number = g_list_length (nonterm_list);
-
+	
 	g_hash_table_insert (nonterm_hash, nterm->name, nterm);
 
 	return nterm;
@@ -204,12 +204,12 @@ void
 start_nonterm (char *id)
 {
 	static gboolean start_def;
-
+	
 	if (start_def)
 		yyerror ("start symbol redeclared");
-
+	
 	start_def = TRUE;
-	nonterm (id);
+	nonterm (id); 
 }
 
 static void
@@ -226,7 +226,7 @@ emit_tree_string (Tree *tree)
 			}
 			output (")");
 		}
-	} else
+	} else 
 		output ("%s", tree->nonterm->name);
 }
 
@@ -234,7 +234,7 @@ static void
 emit_rule_string (Rule *rule, char *fill)
 {
 	output ("%s/* ", fill);
-
+	
 	output ("%s: ", rule->lhs->name);
 
 	emit_tree_string (rule->tree);
@@ -448,7 +448,7 @@ emit_state ()
 		output ("\tMBTREE_TYPE\t *tree;\n");
 		output ("\tgint32 reg1, reg2;\n");
 	}
-
+	
 	output ("\tstruct _MBState\t\t*left, *right;\n");
 	output ("\tguint16\t\tcost[%d];\n", g_list_length (nonterm_list) + 1);
 
@@ -459,7 +459,7 @@ emit_state ()
 		j = 1;
 		while (i >>= 1)
 			j++;
-		output ("\tunsigned int\t rule_%s:%d;\n",  n->name, j);
+		output ("\tunsigned int\t rule_%s:%d;\n",  n->name, j); 
 	}
 	output ("};\n\n");
 	output ("typedef struct _MBState MBState;\n");
@@ -479,7 +479,7 @@ emit_decoders ()
 			Rule *rule = (Rule *)rl->data;
 			output ("\t%d,\n", g_list_index (rule_list, rule) + 1);
 		}
-
+		
 		output ("};\n\n");
 	}
 }
@@ -519,10 +519,10 @@ emit_tree_match (char *st, Tree *t)
 static void
 emit_rule_match (Rule *rule)
 {
-	Tree *t = rule->tree;
+	Tree *t = rule->tree; 
 
-	if ((t->left && t->left->op) ||
-	    (t->right && t->right->op)) {
+	if ((t->left && t->left->op) || 
+	    (t->right && t->right->op)) {	
 		output ("\t\tif (\n");
 		emit_tree_match ("p->", t);
 		output ("\n\t\t)\n");
@@ -565,16 +565,16 @@ emit_cond_assign (Rule *rule, char *cost, char *fill)
 
 	output ("%s\tp->cost[MB_NTERM_%s] = %s;\n", fill, rule->lhs->name, rc);
 
-	output ("%s\tp->rule_%s = %d;\n", fill, rule->lhs->name,
+	output ("%s\tp->rule_%s = %d;\n", fill, rule->lhs->name, 
 		g_list_index (rule->lhs->rules, rule) + 1);
 
 	if (rule->lhs->chain)
-		output ("%s\tclosure_%s (p, %s);\n", fill, rule->lhs->name, rc);
+		output ("%s\tclosure_%s (p, %s);\n", fill, rule->lhs->name, rc); 
 
 	output ("%s}\n", fill);
 
 	g_free (rc);
-
+	
 }
 
 static void
@@ -593,7 +593,7 @@ emit_label_func ()
 
 	output ("\tint arity;\n");
 	output ("\tint c;\n");
-	if (!dag_mode)
+	if (!dag_mode) 
 		output ("\tMBState *p;\n");
 	output ("\tMBState *left = NULL, *right = NULL;\n\n");
 
@@ -603,7 +603,7 @@ emit_label_func ()
 	output ("\tcase 1:\n");
 	if (dag_mode) {
 		output ("\t\tleft = MBALLOC_STATE;\n");
-		output ("\t\tmono_burg_label_priv (MBTREE_LEFT(tree), data, left);\n");
+		output ("\t\tmono_burg_label_priv (MBTREE_LEFT(tree), data, left);\n");		
 	} else {
 		output ("\t\tleft = mono_burg_label_priv (MBTREE_LEFT(tree), data);\n");
 		output ("\t\tright = NULL;\n");
@@ -612,9 +612,9 @@ emit_label_func ()
 	output ("\tcase 2:\n");
 	if (dag_mode) {
 		output ("\t\tleft = MBALLOC_STATE;\n");
-		output ("\t\tmono_burg_label_priv (MBTREE_LEFT(tree), data, left);\n");
+		output ("\t\tmono_burg_label_priv (MBTREE_LEFT(tree), data, left);\n");		
 		output ("\t\tright = MBALLOC_STATE;\n");
-		output ("\t\tmono_burg_label_priv (MBTREE_RIGHT(tree), data, right);\n");
+		output ("\t\tmono_burg_label_priv (MBTREE_RIGHT(tree), data, right);\n");		
 	} else {
 		output ("\t\tleft = mono_burg_label_priv (MBTREE_LEFT(tree), data);\n");
 		output ("\t\tright = mono_burg_label_priv (MBTREE_RIGHT(tree), data);\n");
@@ -633,8 +633,8 @@ emit_label_func ()
 	output ("\tp->right = right;\n");
 
 	if (dag_mode)
-		output ("\tp->tree = tree;\n");
-
+		output ("\tp->tree = tree;\n");	
+	
 	for (l = nonterm_list, i = 0; l; l = l->next) {
 		output ("\tp->cost [%d] = 32767;\n", ++i);
 	}
@@ -644,26 +644,26 @@ emit_label_func ()
 	for (l = term_list; l; l = l->next) {
 		Term *t = (Term *)l->data;
 		GList *rl;
-
+		
 		if (predefined_terms)
 			output ("\tcase %s: /* %s */\n", t->name, t->name);
 		else
 			output ("\tcase %d: /* %s */\n", t->number, t->name);
 
 		for (rl = t->rules; rl; rl = rl->next) {
-			Rule *rule = (Rule *)rl->data;
+			Rule *rule = (Rule *)rl->data; 
 			Tree *t = rule->tree;
 
 			emit_rule_string (rule, "\t\t");
 
 			emit_rule_match (rule);
-
+			
 			output ("\t\t{\n");
 
 			output ("\t\t\tc = ");
-
+			
 			emit_costs ("", t);
-
+	
 			output ("%s;\n", rule->cost);
 
 			emit_cond_assign (rule, NULL, "\t\t\t");
@@ -673,7 +673,7 @@ emit_label_func ()
 
 		output ("\t\tbreak;\n");
 	}
-
+	
 	output ("\tdefault:\n");
 	output ("#ifdef MBGET_OP_NAME\n");
 	output ("\t\tg_error (\"unknown operator: %%s\", MBGET_OP_NAME(MBTREE_OP(tree)));\n");
@@ -689,13 +689,11 @@ emit_label_func ()
 
 	output ("}\n\n");
 
-	if (!with_exported_symbols)
-		output ("static ");
 	output ("MBState *\n");
 	output ("mono_burg_label (MBTREE_TYPE *tree, MBCOST_DATA *data)\n{\n");
 	if (dag_mode) {
 		output ("\tMBState *p = MBALLOC_STATE;\n");
-		output ("\tmono_burg_label_priv (tree, data, p);\n");
+		output ("\tmono_burg_label_priv (tree, data, p);\n");		
 	} else {
 		output ("\tMBState *p = mono_burg_label_priv (tree, data);\n");
 	}
@@ -714,16 +712,16 @@ compute_kids (char *ts, Tree *tree, int *n)
 		char *res2 = NULL;
 
 		if (dag_mode) {
-			res = compute_kids (g_strdup_printf ("%s->left", ts),
+			res = compute_kids (g_strdup_printf ("%s->left", ts), 
 					    tree->left, n);
 			if (tree->op->arity == 2)
-				res2 = compute_kids (g_strdup_printf ("%s->right", ts),
+				res2 = compute_kids (g_strdup_printf ("%s->right", ts), 
 						     tree->right, n);
 		} else {
-			res = compute_kids (g_strdup_printf ("MBTREE_LEFT(%s)", ts),
+			res = compute_kids (g_strdup_printf ("MBTREE_LEFT(%s)", ts), 
 					    tree->left, n);
 			if (tree->op->arity == 2)
-				res2 = compute_kids (g_strdup_printf ("MBTREE_RIGHT(%s)", ts),
+				res2 = compute_kids (g_strdup_printf ("MBTREE_RIGHT(%s)", ts), 
 						     tree->right, n);
 		}
 
@@ -739,12 +737,10 @@ emit_kids ()
 	int i, j, c, n, *si;
 	char **sa;
 
-	if (!with_exported_symbols)
-		output ("static ");
 	output ("int\n");
 	output ("mono_burg_rule (MBState *state, int goal)\n{\n");
 
-	output ("\tg_return_val_if_fail (state != NULL, 0);\n");
+	output ("\tg_return_val_if_fail (state != NULL, 0);\n"); 
 	output ("\tg_return_val_if_fail (goal > 0, 0);\n\n");
 
 	output ("\tswitch (goal) {\n");
@@ -763,16 +759,12 @@ emit_kids ()
 
 
 	if (dag_mode) {
-		if (!with_exported_symbols)
-			output ("static ");
 		output ("MBState **\n");
 		output ("mono_burg_kids (MBState *state, int rulenr, MBState *kids [])\n{\n");
 		output ("\tg_return_val_if_fail (state != NULL, NULL);\n");
 		output ("\tg_return_val_if_fail (kids != NULL, NULL);\n\n");
 
 	} else {
-		if (!with_exported_symbols)
-			output ("static ");
 		output ("MBTREE_TYPE **\n");
 		output ("mono_burg_kids (MBTREE_TYPE *tree, int rulenr, MBTREE_TYPE *kids [])\n{\n");
 		output ("\tg_return_val_if_fail (tree != NULL, NULL);\n");
@@ -829,7 +821,7 @@ emit_emitter_func ()
 
 	for (l =  rule_list, i = 0; l; l = l->next) {
 		Rule *rule = (Rule *)l->data;
-
+		
 		if (rule->code) {
 			if ((rulen = GPOINTER_TO_INT (g_hash_table_lookup (cache, rule->code)))) {
 				emit_rule_string (rule, "");
@@ -855,8 +847,6 @@ emit_emitter_func ()
 
 	g_hash_table_destroy (cache);
 
-	if (!with_exported_symbols)
-		output ("static ");
 	output ("MBEmitFunc const mono_burg_func [] = {\n");
 	output ("\tNULL,\n");
 	for (l =  rule_list, i = 0; l; l = l->next) {
@@ -876,17 +866,14 @@ emit_cost_func ()
 	GList *l;
 	int i;
 
-	if (!with_exported_symbols)
-		output ("static int mono_burg_rule (MBState *state, int goal);\n");
-
 	for (l =  rule_list, i = 0; l; l = l->next) {
 		Rule *rule = (Rule *)l->data;
-
+		
 		if (rule->cfunc) {
 			output ("inline static guint16\n");
 
 			emit_rule_string (rule, "");
-
+			
 			if (dag_mode)
 				output ("mono_burg_cost_%d (MBState *state, MBCOST_DATA *data)\n", i + 1);
 			else
@@ -906,7 +893,7 @@ emit_closure ()
 
 	for (l = nonterm_list; l; l = l->next) {
 		NonTerm *n = (NonTerm *)l->data;
-
+		
 		if (n->chain)
 			output ("static void closure_%s (MBState *p, int c);\n", n->name);
 	}
@@ -915,13 +902,13 @@ emit_closure ()
 
 	for (l = nonterm_list; l; l = l->next) {
 		NonTerm *n = (NonTerm *)l->data;
-
+		
 		if (n->chain) {
 			output ("static void\n");
 			output ("closure_%s (MBState *p, int c)\n{\n", n->name);
 			for (rl = n->chain; rl; rl = rl->next) {
 				Rule *rule = (Rule *)rl->data;
-
+				
 				emit_rule_string (rule, "\t");
 				emit_cond_assign (rule, rule->cost, "\t");
 			}
@@ -941,7 +928,7 @@ compute_nonterms (Tree *tree)
 	} else {
 		return g_strconcat (compute_nonterms (tree->left),
 				    compute_nonterms (tree->right), NULL);
-	}
+	} 
 }
 
 static void
@@ -952,9 +939,8 @@ emit_vardefs ()
 	char **sa;
 
 	if (predefined_terms) {
-		output ("guint8 mono_burg_arity [MBMAX_OPCODES];\n");
-		if (!with_exported_symbols)
-			output ("static ");
+		output ("guint8 mono_burg_arity [MBMAX_OPCODES];\n"); 
+
 		output ("void\nmono_burg_init (void)\n{\n");
 
 		for (l = term_list, i = 0; l; l = l->next) {
@@ -967,7 +953,7 @@ emit_vardefs ()
 		output ("}\n\n");
 
 	} else {
-		output ("const guint8 mono_burg_arity [] = {\n");
+		output ("const guint8 mono_burg_arity [] = {\n"); 
 		for (l = term_list, i = 0; l; l = l->next) {
 			Term *t = (Term *)l->data;
 
@@ -975,14 +961,14 @@ emit_vardefs ()
 				output ("\t0,\n");
 				i++;
 			}
-
+		
 			output ("\t%d, /* %s */\n", t->arity, t->name);
 
 			i++;
 		}
 		output ("};\n\n");
 
-		if (with_exported_symbols) {
+		if (with_debug_tables) {
 			output ("const char *const mono_burg_term_string [] = {\n");
 			output ("\tNULL,\n");
 			for (l = term_list, i = 0; l; l = l->next) {
@@ -993,17 +979,17 @@ emit_vardefs ()
 		}
 	}
 
-	if (!with_exported_symbols)
-		output ("static ");
-	output ("const char * const mono_burg_rule_string [] = {\n");
-	output ("\tNULL,\n");
-	for (l = rule_list, i = 0; l; l = l->next) {
-		Rule *rule = (Rule *)l->data;
-		output ("\t\"%s: ", rule->lhs->name);
-		emit_tree_string (rule->tree);
-		output ("\",\n");
+	if (with_debug_tables) {
+		output ("const char * const mono_burg_rule_string [] = {\n");
+		output ("\tNULL,\n");
+		for (l = rule_list, i = 0; l; l = l->next) {
+			Rule *rule = (Rule *)l->data;
+			output ("\t\"%s: ", rule->lhs->name);
+			emit_tree_string (rule->tree);
+			output ("\",\n");
+		}
+		output ("};\n\n");
 	}
-	output ("};\n\n");
 
 	n = g_list_length (rule_list);
 	sa = g_new0 (char *, n);
@@ -1023,11 +1009,9 @@ emit_vardefs ()
 			output ("static const guint16 mono_burg_nts_%d [] = { %s0 };\n", c, s);
 			sa [c++] = s;
 		}
-	}
+	}	
 	output ("\n");
 
-	if (!with_exported_symbols)
-		output ("static ");
 	output ("const guint16 *const mono_burg_nts [] = {\n");
 	output ("\t0,\n");
 	for (l = rule_list, i = 0; l; l = l->next) {
@@ -1046,22 +1030,22 @@ emit_prototypes ()
 	else
 		output ("typedef void (*MBEmitFunc) (MBTREE_TYPE *tree, MBCGEN_TYPE *s);\n\n");
 
-	if (with_exported_symbols) {
+	if (with_debug_tables) {
 		output ("extern const char * const mono_burg_term_string [];\n");
 		output ("extern const char * const mono_burg_rule_string [];\n");
-		output ("extern const guint16 *const mono_burg_nts [];\n");
-		output ("extern MBEmitFunc const mono_burg_func [];\n");
-
-		output ("MBState *mono_burg_label (MBTREE_TYPE *tree, MBCOST_DATA *data);\n");
-		output ("int mono_burg_rule (MBState *state, int goal);\n");
-
-		if (dag_mode)
-		  output ("MBState **mono_burg_kids (MBState *state, int rulenr, MBState *kids []);\n");
-		else
-		  output ("MBTREE_TYPE **mono_burg_kids (MBTREE_TYPE *tree, int rulenr, MBTREE_TYPE *kids []);\n");
-
-		output ("extern void mono_burg_init (void);\n");
 	}
+	output ("extern const guint16 *const mono_burg_nts [];\n");
+	output ("extern MBEmitFunc const mono_burg_func [];\n");
+
+	output ("MBState *mono_burg_label (MBTREE_TYPE *tree, MBCOST_DATA *data);\n");
+	output ("int mono_burg_rule (MBState *state, int goal);\n");
+
+	if (dag_mode)
+		output ("MBState **mono_burg_kids (MBState *state, int rulenr, MBState *kids []);\n");
+	else
+		output ("MBTREE_TYPE **mono_burg_kids (MBTREE_TYPE *tree, int rulenr, MBTREE_TYPE *kids []);\n");
+
+	output ("extern void mono_burg_init (void);\n");
 	output ("\n");
 }
 
@@ -1099,7 +1083,7 @@ check_result ()
 		Term *term = (Term *)l->data;
 		if (term->arity == -1)
 			g_warning ("unused terminal \"%s\"",term->name);
-	}
+	} 
 
 	check_reach (((NonTerm *)nonterm_list->data));
 
@@ -1124,8 +1108,6 @@ warning_handler (const gchar *log_domain,
 		 const gchar *message,
 		 gpointer user_data)
 {
-	(void) log_domain;
-	(void) log_level;
 	(void) fprintf ((FILE *) user_data, "** WARNING **: %s\n", message);
 }
 
@@ -1161,10 +1143,10 @@ main (int argc, char *argv [])
 			} else if (argv [i][1] == '-') {
 
 				/* Long options */
-				if (strcmp (argv [i] + 2, "without-glib") == 0) {
+				if (strcmp(argv [i] + 2, "without-glib") == 0) {
 					with_glib = FALSE;
-				} else if (strcmp (argv [i] + 2, "without-exported-symbols") == 0) {
-					with_exported_symbols = FALSE;
+				} else if (strcmp(argv [i] + 2, "without-debug-tables") == 0) {
+					with_debug_tables = FALSE;
 				} else {
 					usage ();
 				}
@@ -1185,7 +1167,7 @@ main (int argc, char *argv [])
 		outputfd = deffd;
 		output ("#ifndef _MONO_BURG_DEFS_\n");
 		output ("#define _MONO_BURG_DEFS_\n\n");
-	} else
+	} else 
 		outputfd = stdout;
 
 	emit_includes ();
@@ -1239,7 +1221,7 @@ main (int argc, char *argv [])
 
 		output ("#include \"%s\"\n\n", deffile);
 	}
-
+	
 	emit_vardefs ();
 	emit_cost_func ();
 	emit_emitter_func ();

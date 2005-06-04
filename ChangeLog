@@ -1,20 +1,3 @@
-2005-06-04  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
-
-	* parser.y: Add an optional `;' at the end of a rule, in the style
-	of yacc(1).
-	
-
-
-
-2005-05-26  Sebastien Pouliot  <sebastien@ximian.com>
-
-	* monoburg.vcproj: Project file for monobug.
-
-2005-01-18  Zoltan Varga  <vargaz@freemail.hu>
-
-	* monoburg.y (yyparsetail): Handle the case when the burg file does
-	not end with an empty line.
-	
 2004-11-07  Benoit Perrot <benoit@lrde.epita.fr>
 
 	* monoburg.c (emit_header): Extract includes emission.
