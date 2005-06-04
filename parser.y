@@ -17,7 +17,7 @@
 #include <stdarg.h>
 
 #include "monoburg.h"
-  
+
 static int yylineno = 0;
 static int yylinepos = 0;
 
@@ -49,7 +49,7 @@ static int yylinepos = 0;
 
 %%
 
-decls   : /* empty */ 
+decls   : /* empty */
 	| START IDENT { start_nonterm ($2); } decls
 	| TERM  tlist decls
 	| TERMPREFIX plist decls
@@ -70,7 +70,8 @@ rule_list : rule { $$ = g_list_append (NULL, $1); }
 	;
 
 optcode : /* empty */ { $$ = NULL; }
-	| CODE 
+	| ';' { $$ = NULL; }
+	| CODE
 	;
 
 plist	: /* empty */
@@ -100,7 +101,7 @@ optcfunc : /*empty */ { $$ = NULL; }
 static char input[2048];
 static char *next = input;
 
-void 
+void
 yyerror (char *fmt, ...)
 {
   va_list ap;
@@ -231,7 +232,7 @@ nextchar ()
 	case 0:
 	  if (ll) {
 	    next_state = 1;
-	  } else 
+	  } else
 	    fputs (input, outputfd);
 	  break;
 	case 1:
@@ -247,7 +248,7 @@ nextchar ()
 	state = next_state;
 	yylineno++;
       } while (next_state == 2 || ll);
-    } 
+    }
 
     return *next++;
 }
@@ -261,8 +262,8 @@ yyparsetail (void)
   input[0] = '\0';
 }
 
-int 
-yylex (void) 
+int
+yylex (void)
 {
   char c;
 
@@ -314,7 +315,7 @@ yylex (void)
 	return COST;
       }
 
-      while (isalpha (*n) || isdigit (*n) || *n == '_') 
+      while (isalpha (*n) || isdigit (*n) || *n == '_')
 	      n++;
 
       l = n - next + 1;
@@ -322,14 +323,14 @@ yylex (void)
       next = n;
       return IDENT;
     }
-    
+
     if (c == '"') {
       int i = 0;
       static char buf [100000];
- 
+
       while ((c = *next++) != '"' && c)
 	buf [i++] = c;
-      
+
       buf [i] = '\0';
       yylval.text = g_strdup (buf);
 
@@ -339,7 +340,7 @@ yylex (void)
     if (c == '{') {
       int i = 0, d = 1;
       static char buf [100000];
- 
+
       while (d && (c = nextchar ())) {
 	buf [i++] = c;
 	assert (i < sizeof (buf));
@@ -356,9 +357,9 @@ yylex (void)
 
       return CODE;
     }
-    
+
     return c;
-  
+
   } while (1);
 }
 
