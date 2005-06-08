@@ -121,6 +121,9 @@ char *fgets_inc(char *s, int size)
       return 0;
     free (inputs[n_input].filename);
     fclose (inputs[n_input--].fd);
+    fprintf (outputfd, "#line %d \"%s\"\n",
+	     inputs[n_input].yylineno + 1,
+	     inputs[n_input].filename);
     return fgets_inc(s, size);
   }
 
@@ -139,6 +142,7 @@ char *fgets_inc(char *s, int size)
     if (!(inputs[n_input + 1].fd = fopen (filename, "r")))
       yyerror ("`%%include %s': %s",
 	       filename, strerror(errno));
+    fprintf (outputfd, "#line %d \"%s\"\n", 1, filename);
     inputs[++n_input].yylineno = 0;
     inputs[n_input].filename = strdup (filename);
     return fgets_inc(s, size);
@@ -301,6 +305,8 @@ nextchar ()
 void
 yyparsetail (void)
 {
+  fprintf (outputfd, "#line %d \"%s\"\n", inputs[n_input].yylineno,
+	   inputs[n_input].filename);
   fputs (input, outputfd);
   while (fgets_inc (input, sizeof (input)))
     fputs (input, outputfd);
@@ -391,6 +397,8 @@ yylex (void)
       unsigned i = 0, d = 1;
       static char buf [100000];
 
+      i = sprintf (buf, "#line %d \"%s\"\n", inputs[n_input].yylineno,
+		   inputs[n_input].filename);
       while (d && (c = nextchar ())) {
 	buf [i++] = c;
 	assert (i < sizeof (buf));

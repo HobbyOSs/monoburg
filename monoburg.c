@@ -1240,6 +1240,7 @@ main (int argc, char *argv [])
 			}
 			inputs[0].filename = infile;
 
+			output ("#line %d \"%s\"\n", 1, infile);
 			yyparse ();
 
 			reset_parser ();
