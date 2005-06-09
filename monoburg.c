@@ -37,6 +37,9 @@ static int default_cost = 0;
 char *namespaces[MAX_NAMESPACES];
 int n_namespace = 0;
 
+char **include_dirs;
+int n_include_dir = 0;
+
 static void output (char *fmt, ...)
 {
 	va_list ap;
@@ -1171,6 +1174,8 @@ main (int argc, char *argv [])
 
         definedvars = g_hash_table_new (g_str_hash, g_str_equal);
 	g_log_set_handler (NULL, G_LOG_LEVEL_WARNING, warning_handler, stderr);
+	include_dirs = g_new (char *, 10);
+	include_dirs [n_include_dir++] = ".";
 
 	for (i = 1; i < argc; i++){
 		if (argv [i][0] == '-'){
@@ -1192,6 +1197,10 @@ main (int argc, char *argv [])
 			} else if (argv [i][1] == 'D') {
                                 g_hash_table_insert (definedvars, &argv [i][2],
                                                      GUINT_TO_POINTER (1));
+			} else if (argv [i][1] == 'I') {
+				if (n_include_dir % 10 == 0)
+					include_dirs = g_renew (char *, include_dirs, n_include_dir + 10);
+				include_dirs [n_include_dir++] = argv [++i];
 			} else if (argv [i][1] == '-') {
 
 				/* Long options */
@@ -1315,6 +1324,6 @@ main (int argc, char *argv [])
 
 	if (cfile)
 		fclose (cfd);
-
+	g_free (include_dirs);
 	return 0;
 }

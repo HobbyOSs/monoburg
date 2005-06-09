@@ -110,8 +110,10 @@ static int n_input = 0;
 
 char *fgets_inc(char *s, int size)
 {
-  int n_length;
+  int n_length, i;
   char filename[MAX_FILENAME_LEN];
+  int b_found = FALSE;
+  char path[MAX_FILENAME_LEN * 2];
 
   /* 9 == strlen("%include "); */
   assert (size > 9 + MAX_FILENAME_LEN);
@@ -139,12 +141,18 @@ char *fgets_inc(char *s, int size)
     if (s[n_length - 1] == '\n')
       s[n_length - 1] = 0;
     strcpy (filename, s + 9);
-    if (!(inputs[n_input + 1].fd = fopen (filename, "r")))
+    for (i = 0; (b_found == FALSE) && i < n_include_dir; ++i)
+    {
+      sprintf (path, "%s/%s", include_dirs[i], filename);
+      if ((inputs[n_input + 1].fd = fopen (path, "r")))
+	b_found = TRUE;
+    }
+    if (b_found == FALSE)
       yyerror ("`%%include %s': %s",
 	       filename, strerror(errno));
-    fprintf (outputfd, "#line %d \"%s\"\n", 1, filename);
+    fprintf (outputfd, "#line %d \"%s\"\n", 1, path);
     inputs[++n_input].yylineno = 0;
-    inputs[n_input].filename = strdup (filename);
+    inputs[n_input].filename = strdup (path);
     return fgets_inc(s, size);
   }
   return s;

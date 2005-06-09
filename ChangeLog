@@ -1,5 +1,11 @@
 2005-06-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* parser.y: Search through `include_dirs' paths for file to include.
+	* monoburg.h,
+	* monoburg.c: Add a `-I' option to precise include directories.
+
+2005-06-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* parser.y: Add `#line' directives output on `%include', CODE and
 	in `yyparsetail'.
 	* monoburg.c: Add `#line' directives output just before the call to

@@ -15,6 +15,9 @@ extern FILE *outputfd;
 extern GHashTable *definedvars;
 extern char *namespaces[MAX_NAMESPACES];
 extern int n_namespace;
+extern char **include_dirs;
+extern int n_include_dir;
+
 
 typedef struct _Rule Rule;
 
