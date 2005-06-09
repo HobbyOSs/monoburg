@@ -290,8 +290,6 @@ emit_includes ()
 static void
 emit_header ()
 {
-	GList *l;
-
 	if (!with_glib) {
 		output ("#ifndef guint8\n");
 		output ("# define guint8 unsigned char\n");
@@ -407,6 +405,13 @@ emit_header ()
 
 	output ("\n");
 
+}
+
+static void
+emit_term ()
+{
+	GList *l;
+
 	for (l = term_list; l; l = l->next) {
 		Term *t = (Term *)l->data;
 		if (t->number == -1)
@@ -414,30 +419,35 @@ emit_header ()
 	}
 	term_list = g_list_sort (term_list, (GCompareFunc)term_compare_func);
 
+	output ("typedef enum {\n");
 	for (l = term_list; l; l = l->next) {
 		Term *t = (Term *)l->data;
 		if (t->number == -1)
 			t->number = next_term_num ();
 
 		if (predefined_terms)
-			output ("#define MB_TERM_%s\t %s\n", t->name, t->name);
+			output ("\tMB_TERM_%s = %s%s\n", t->name, t->name,
+				l->next ? "," : "");
 		else
-			output ("#define MB_TERM_%s\t %d\n", t->name, t->number);
-
+			output ("\tMB_TERM_%s = %d%s\n", t->name, t->number,
+				l->next ? "," : "");
 	}
-	output ("\n");
-
+	output ("} MBTerms;\n\n");
 }
+
 
 static void
 emit_nonterm ()
 {
 	GList *l;
 
+	output ("typedef enum {\n");
 	for (l = nonterm_list; l; l = l->next) {
 		NonTerm *n = (NonTerm *)l->data;
-		output ("#define MB_NTERM_%s\t%d\n", n->name, n->number);
+		output ("\tMB_NTERM_%s = %d%s\n", n->name, n->number,
+			(l->next) ? "," : "");
 	}
+	output ("} MBNTerms;\n\n");
 	output ("#define MB_MAX_NTERMS\t%d\n", g_list_length (nonterm_list));
 	output ("\n");
 }
@@ -1271,6 +1281,7 @@ main (int argc, char *argv [])
 	emit_header ();
 	for (i = 0; i < n_namespace; ++i)
 	  output ("namespace %s {\n", namespaces[i]);
+	emit_term ();
 	emit_nonterm ();
 	emit_state ();
 	emit_prototypes ();

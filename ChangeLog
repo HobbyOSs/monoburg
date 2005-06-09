@@ -1,5 +1,10 @@
 2005-06-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* monoburg.c: Output MB_TERM* and MB_NTERM* in enums `MBTerms' and
+	`MBNTerms'.
+
+2005-06-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* parser.y: Do not output "#line" directives when reading rules.
 
 2005-06-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
