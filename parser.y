@@ -53,7 +53,7 @@ decls   : /* empty */
 	| TERM  tlist decls
 	| TERMPREFIX plist decls
 	| NAMESPACE IDENT {
-			warn_cpp ("`%namespace' directive");
+			warn_cxx ("`%namespace' directive");
 			if (n_namespace == MAX_NAMESPACES)
 				yyerror ("maximum namespace depth reached.");
 			else

@@ -1,5 +1,11 @@
 2005-06-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* parser.y,
+	* monoburg.c,
+	* monoburg.h: Rename "warn_cpp" function to "warn_cxx".
+
+2005-06-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* monoburg.c: Output MB_TERM* and MB_NTERM* in enums `MBTerms' and
 	`MBNTerms'.
 

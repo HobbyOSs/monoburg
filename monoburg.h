@@ -85,7 +85,7 @@ void     rule_add       (Rule *rule, char *code, char *cost, char *cfunc);
 void     create_rule    (char *id, Tree *tree, char *code, char *cost,
 			 char *cfunc);
 
-void     warn_cpp       (const gchar *use_of);
+void     warn_cxx       (const gchar *use_of);
 
 void     yyparsetail    (void);
 

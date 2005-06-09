@@ -1136,7 +1136,7 @@ check_result ()
 }
 
 void
-warn_cpp (const gchar *use_of)
+warn_cxx (const gchar *use_of)
 {
 	static int b_said = FALSE;
 
@@ -1221,7 +1221,7 @@ main (int argc, char *argv [])
 				} else if (strcmp(argv [i] + 2, "without-exported-symbols") == 0) {
 					with_exported_symbols = FALSE;
 				} else if (strcmp(argv [i] + 2, "with-references") == 0) {
-					warn_cpp ("`--with-references' option");
+					warn_cxx ("`--with-references' option");
 					with_references = TRUE;
 				} else {
 					usage ();
