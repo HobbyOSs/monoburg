@@ -1,5 +1,9 @@
 2005-06-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* monoburg.c: Make the `usage' message more verbose.
+
+2005-06-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* monoburg.c: Add a `-n' option to precise the top #define used in
 	the generated header.
 
