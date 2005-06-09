@@ -1,5 +1,10 @@
 2005-06-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* monoburg.c: Add a `-n' option to precise the top #define used in
+	the generated header.
+
+2005-06-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* parser.y,
 	* monoburg.c,
 	* monoburg.h: Rename "warn_cpp" function to "warn_cxx".

@@ -27,6 +27,7 @@ GHashTable *definedvars;
 static FILE *deffd;
 static FILE *cfd;
 
+static char *header_define = 0;
 static gboolean with_glib = TRUE;
 static gboolean with_exported_symbols = TRUE;
 static gboolean with_references = FALSE;
@@ -1211,6 +1212,8 @@ main (int argc, char *argv [])
 				if (n_include_dir % 10 == 0)
 					include_dirs = g_renew (char *, include_dirs, n_include_dir + 10);
 				include_dirs [n_include_dir++] = argv [++i];
+			} else if (argv [i][1] == 'n') {
+				header_define = argv [++i];
 			} else if (argv [i][1] == '-') {
 
 				/* Long options */
@@ -1241,8 +1244,10 @@ main (int argc, char *argv [])
 			exit (-1);
 		}
 		outputfd = deffd;
-		output ("#ifndef _MONO_BURG_DEFS_\n");
-		output ("#define _MONO_BURG_DEFS_\n\n");
+		output ("#ifndef %s\n",
+			header_define ? header_define : "_MONO_BURG_DEFS_");
+		output ("# define %s\n\n",
+			header_define ? header_define : "_MONO_BURG_DEFS_");
 	} else
 		outputfd = stdout;
 
@@ -1289,7 +1294,8 @@ main (int argc, char *argv [])
 	  output ("}\n");
 
 	if (deffd) {
-		output ("#endif /* _MONO_BURG_DEFS_ */\n");
+		output ("#endif /* %s */\n",
+			header_define ? header_define : "_MONO_BURG_DEFS_");
 		fclose (deffd);
 
 		if (cfile == NULL)
