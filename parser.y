@@ -107,6 +107,8 @@ optcfunc : /*empty */ { $$ = NULL; }
 static char input[2048];
 static char *next = input;
 static int n_input = 0;
+static int state = 0;
+
 
 char *fgets_inc(char *s, int size)
 {
@@ -123,9 +125,10 @@ char *fgets_inc(char *s, int size)
       return 0;
     free (inputs[n_input].filename);
     fclose (inputs[n_input--].fd);
-    fprintf (outputfd, "#line %d \"%s\"\n",
-	     inputs[n_input].yylineno + 1,
-	     inputs[n_input].filename);
+    if (state != 1)
+      fprintf (outputfd, "#line %d \"%s\"\n",
+	       inputs[n_input].yylineno + 1,
+	       inputs[n_input].filename);
     return fgets_inc(s, size);
   }
 
@@ -150,7 +153,8 @@ char *fgets_inc(char *s, int size)
     if (b_found == FALSE)
       yyerror ("`%%include %s': %s",
 	       filename, strerror(errno));
-    fprintf (outputfd, "#line %d \"%s\"\n", 1, path);
+    if (state != 1)
+      fprintf (outputfd, "#line %d \"%s\"\n", 1, path);
     inputs[++n_input].yylineno = 0;
     inputs[n_input].filename = strdup (path);
     return fgets_inc(s, size);
@@ -174,8 +178,6 @@ yyerror (char *fmt, ...)
 
   exit (-1);
 }
-
-static int state = 0;
 
 void
 reset_parser ()
