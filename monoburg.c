@@ -31,6 +31,7 @@ static char *header_define = 0;
 static gboolean with_glib = TRUE;
 static gboolean with_exported_symbols = TRUE;
 static gboolean with_references = FALSE;
+static int quiet = FALSE;
 static int dag_mode = 0;
 static int predefined_terms = 0;
 static int default_cost = 0;
@@ -1106,7 +1107,7 @@ warn_cxx (const gchar *use_of)
 {
 	static int b_said = FALSE;
 
-	if (!b_said) {
+	if (!b_said && !quiet) {
 		g_warning ("using %s will lead to produce C++ only code",
 			   use_of);
 		b_said = TRUE;
@@ -1130,6 +1131,7 @@ usage (const char *program_name)
 		"  -n STRING                   Set STRING to be the #define at the\n"
 		"                              top of the header file.\n"
 		"  -p                          Terms are predefined.\n"
+		"  -q, --quiet                 Do not output warning messages.\n"
 		"  -s FILE                     Source will be output to FILE.\n"
 		"                              for %%include.\n"
 		"  -v, --version               Output version number and quit.\n"
@@ -1191,6 +1193,8 @@ main (int argc, char *argv [])
 				usage (argv [0]);
 			} else if (argv [i][1] == 'v') {
 				version ();
+			} else if (argv [i][1] == 'q') {
+				quiet = TRUE;
 			} else if (argv [i][1] == 'e') {
 				dag_mode = 1;
 			} else if (argv [i][1] == 'p') {
@@ -1217,10 +1221,11 @@ main (int argc, char *argv [])
 					with_glib = FALSE;
 				} else if (strcmp(argv [i] + 2, "version") == 0) {
 					version ();
+				} else if (strcmp(argv [i] + 2, "quiet") == 0) {
+					quiet = TRUE;
 				} else if (strcmp(argv [i] + 2, "without-exported-symbols") == 0) {
 					with_exported_symbols = FALSE;
 				} else if (strcmp(argv [i] + 2, "with-references") == 0) {
-					warn_cxx ("`--with-references' option");
 					with_references = TRUE;
 				} else {
 					bad_use (argv [0], argv [i]);
@@ -1233,6 +1238,9 @@ main (int argc, char *argv [])
 			infiles = g_list_append (infiles, argv [i]);
 		}
 	}
+
+	if (with_references)
+		warn_cxx ("`--with-references' option");
 
 	if (deffile) {
 		if (!(deffd = fopen (deffile, "w"))) {
@@ -1274,7 +1282,8 @@ main (int argc, char *argv [])
 		yyparse ();
 	}
 
-	check_result ();
+	if (!quiet)
+		check_result ();
 
 	if (!nonterm_list)
 		g_error ("no start symbol found");

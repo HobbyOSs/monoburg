@@ -1,3 +1,7 @@
+2005-06-14  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
+	* monoburg.c: Add a `--quiet' option to disable warning messages.
+
 2005-06-13  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
 	* monoburg.c:   Remove   useless   definitions  of   `g_new0'  and
