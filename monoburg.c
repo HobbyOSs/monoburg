@@ -1149,32 +1149,31 @@ warn_cxx (const gchar *use_of)
 }
 
 static void
-usage (char *program_name)
+usage (const char *program_name)
 {
-	fprintf (stderr,
-		 "Usage: %s [OPTIONS]... [SOURCE]\n"
-		 "Generate a code generator from SOURCE. If SOURCE is not\n"
-		 "precised, the standard input will be processed.\n"
-		 "\n"
-		 "Exhaustive list of options :\n"
-		 "  -c VALUE                    Set the default cost to VALUE.\n"
-		 "  -d FILE                     FILE will be the header file.\n"
-		 "  -D\"VAR\"                     VAR will be defined to 1.\n"
-		 "  -e                          Enable DAG compatibility.\n"
-		 "  -h, --help                  Get this message and quit.\n"
-		 "  -I PATH                     Add PATH to the list of directories\n"
-		 "  -n STRING                   Set STRING to be the #define at the\n"
-		 "                              top of the header file.\n"
-		 "  -p                          Terms are predefined.\n"
-		 "  -s FILE                     Source will be output to FILE.\n"
-		 "                              for %%include.\n"
-		 "  -v, --version               Output version number and quit.\n"
-		 "  --without-glib              Output a code glib independent.\n"
-		 "  --without-exported-symbols  Avoid exported symbols as much\n"
-		 "                              as possible.\n"
-		 "  --with-references           Make emit functions to take a reference,\n"
-		 "                              not a pointer.\n",
-		 program_name);
+	printf ("Usage: %s [OPTIONS]... [SOURCE]\n"
+		"Generate a code generator from SOURCE. If SOURCE is not\n"
+		"precised, the standard input will be processed.\n"
+		"\n"
+		"Exhaustive list of options :\n"
+		"  -c VALUE                    Set the default cost to VALUE.\n"
+		"  -d FILE                     FILE will be the header file.\n"
+		"  -D\"VAR\"                     VAR will be defined to 1.\n"
+		"  -e                          Enable DAG compatibility.\n"
+		"  -h, --help                  Get this message and quit.\n"
+		"  -I PATH                     Add PATH to the list of directories\n"
+		"  -n STRING                   Set STRING to be the #define at the\n"
+		"                              top of the header file.\n"
+		"  -p                          Terms are predefined.\n"
+		"  -s FILE                     Source will be output to FILE.\n"
+		"                              for %%include.\n"
+		"  -v, --version               Output version number and quit.\n"
+		"  --without-glib              Output a code glib independent.\n"
+		"  --without-exported-symbols  Avoid exported symbols as much\n"
+		"                              as possible.\n"
+		"  --with-references           Make emit functions to take a reference,\n"
+		"                              not a pointer.\n",
+		program_name);
 	exit (1);
 }
 
@@ -1184,6 +1183,16 @@ version ()
 {
 	printf ("%s\n", PACKAGE_STRING);
 	exit (0);
+}
+
+static void
+bad_use (const char *program_name, const char *use)
+{
+	fprintf (stderr,
+		 "%s: unrecognized option `%s'\n"
+		 "Try `%s --help' for more information.\n",
+		 program_name, use, program_name);
+	exit (1);
 }
 
 static void
@@ -1214,7 +1223,7 @@ main (int argc, char *argv [])
 		if (argv [i][0] == '-'){
 			/* Short options */
 			if (argv [i][1] == 'h') {
-				usage (argv[0]);
+				usage (argv [0]);
 			} else if (argv [i][1] == 'v') {
 				version ();
 			} else if (argv [i][1] == 'e') {
@@ -1249,11 +1258,11 @@ main (int argc, char *argv [])
 					warn_cxx ("`--with-references' option");
 					with_references = TRUE;
 				} else {
-					usage (argv[0]);
+					bad_use (argv [0], argv [i]);
 				}
 
 			} else {
-				usage (argv[0]);
+				bad_use (argv [0], argv [i]);
 			}
 		} else {
 			infiles = g_list_append (infiles, argv [i]);
