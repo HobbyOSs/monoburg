@@ -320,23 +320,6 @@ emit_header ()
 		output ("#endif /* !g_new */\n");
 		output ("\n");
 
-		output ("#ifndef g_new0\n");
-		output ("static void *\n");
-		output ("mono_burg_xcalloc_ (size_t nmemb, size_t size)\n");
-		output ("{\n");
-		output ("	void *p;\n");
-		output ("\n");
-		output ("	p = calloc (nmemb, size);\n");
-		output ("	if (!p) {\n");
-		output ("		fprintf (stderr, \"Not enough memory\\n\");\n");
-		output ("		exit (1);\n");
-		output ("	}\n");
-		output ("	return p;\n");
-		output ("}\n");
-		output ("#define g_new0(struct_type, n_structs) ((struct_type *) mono_burg_xcalloc_(1, sizeof(struct_type) * n_structs))\n");
-		output ("#endif /* !g_new0 */\n");
-		output ("\n");
-
 		output ("#ifndef g_error\n");
 		output ("static int\n");
 		output ("mono_burg_error_ (const char *format, ...)\n");
@@ -353,24 +336,6 @@ emit_header ()
 		output ("}\n");
 		output ("# define g_error mono_burg_error_\n");
 		output ("#endif /* !g_error */\n");
-
-		output ("#ifndef g_warning\n");
-		output ("static int\n");
-		output ("mono_burg_warning_ (const char *format, ...)\n");
-		output ("{\n");
-		output ("	int n = 0;\n");
-		output ("	va_list ap;\n");
-		output ("\n");
-		output ("	n = fprintf (stderr, \"Warning: \");\n");
-		output ("	va_start (ap, format);\n");
-		output ("	n += vfprintf (stderr, format, ap);\n");
-		output ("	va_end (ap);\n");
-		output ("\n");
-		output ("	return n;\n");
-		output ("}\n");
-		output ("# define g_warning mono_burg_warning_\n");
-		output ("#endif /* !g_warning */\n");
-		output ("\n");
 
 		output ("#ifndef g_assert\n");
 		output ("# define g_assert assert\n");

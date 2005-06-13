@@ -1,5 +1,11 @@
 2005-06-13  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* monoburg.c:   Remove   useless   definitions  of   `g_new0'  and
+	`g_warning'.  As they're  not used in the output  code, there's no
+	reason to define them.
+
+2005-06-13  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* monoburg.c: Display usage message on the standard output and be less
 	verbose on bad options.
 
