@@ -1,5 +1,9 @@
 2005-06-27  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* configure.ac: Bump to 1.0.2.
+
+2005-06-27  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* monoburg.c (check_varname): Fix typo in yyerror call.
 	* monoburg.c,
 	* monoburg.h: Check the use of named rules with multiple rules.
