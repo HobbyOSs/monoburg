@@ -75,6 +75,8 @@ Term    *create_term    (char *id, int num);
 
 void     create_term_prefix (char *id);
 
+GList	*rule_list_prepend (GList *list, Rule *rule);
+
 NonTerm *nonterm        (char *id);
 
 void     start_nonterm  (char *id);

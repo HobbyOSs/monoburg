@@ -72,8 +72,8 @@ decls   : /* empty */
 rule	: IDENT ':' tree { $$ = make_rule ($1, $3); }
 	;
 
-rule_list : rule { $$ = g_list_append (NULL, $1); }
-	| rule ',' rule_list { $$ = g_list_prepend ($3, $1); }
+rule_list : rule { $$ = rule_list_prepend (NULL, $1); }
+	| rule ',' rule_list { $$ = rule_list_prepend ($3, $1); }
 	;
 
 optcode : /* empty */ { $$ = NULL; }

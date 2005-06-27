@@ -1,4 +1,11 @@
-from  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+2005-06-27  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
+	* monoburg.c (check_varname): Fix typo in yyerror call.
+	* monoburg.c,
+	* monoburg.h: Check the use of named rules with multiple rules.
+	* parser.y: Call the named rules check with multiple rules.
+
+2005-06-27  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
 	* parser.y: Add parsing of optional `name:' before a rule member.
 	* monoburg.h,

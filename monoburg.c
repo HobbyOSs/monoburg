@@ -101,18 +101,39 @@ create_rule (char *id, Tree *tree, char *code, char *cost, char *cfunc)
 	rule_add (rule, code, cost, cfunc);
 }
 
-void
+static void
+check_has_varname (Tree *t)
+{
+	if (t->varname)
+		yyerror ("can't use named rules with multiple rules");
+	if (t->left)
+		check_has_varname (t->left);
+	if (t->right)
+		check_has_varname (t->right);
+}
+
+GList *
+rule_list_prepend (GList *list, Rule *rule)
+{
+	if (list && !list->next)
+		check_has_varname (((Rule *) list->data)->tree);
+	if (list)
+		check_has_varname (rule->tree);
+	return g_list_prepend (list, rule);
+}
+
+static void
 check_varname (char *varname, Tree *t)
 {
 	if (t->varname && !strcmp (varname, t->varname))
-		yyerror ("variable name `%s' redefined");
+		yyerror ("variable name `%s' redefined", varname);
 	if (t->left)
 		check_varname (varname, t->left);
 	if (t->right)
 		check_varname (varname, t->right);
 }
 
-void
+static void
 check_varnames (Tree *t_source, Tree *t_on)
 {
 	if (t_source->varname)
