@@ -101,8 +101,30 @@ create_rule (char *id, Tree *tree, char *code, char *cost, char *cfunc)
 	rule_add (rule, code, cost, cfunc);
 }
 
+void
+check_varname (char *varname, Tree *t)
+{
+	if (t->varname && !strcmp (varname, t->varname))
+		yyerror ("variable name `%s' redefined");
+	if (t->left)
+		check_varname (varname, t->left);
+	if (t->right)
+		check_varname (varname, t->right);
+}
+
+void
+check_varnames (Tree *t_source, Tree *t_on)
+{
+	if (t_source->varname)
+		check_varname (t_source->varname, t_on);
+	if (t_source->left)
+		check_varnames (t_source->left, t_on);
+	if (t_source->right)
+		check_varnames (t_source->right, t_on);
+}
+
 Tree *
-create_tree (char *id, Tree *left, Tree *right)
+create_tree (char *id, char *varname, Tree *left, Tree *right)
 {
 	int arity = (left != NULL) + (right != NULL);
 	Term *term = NULL;
@@ -138,6 +160,19 @@ create_tree (char *id, Tree *left, Tree *right)
 	} else {
 		tree->nonterm = nonterm (id);
 	}
+
+	if (varname) {
+		if (tree->left)
+			check_varname (varname, tree->left);
+		if (tree->right)
+			check_varname (varname, tree->right);
+		tree->varname = g_strdup (varname);
+	} else {
+		tree->varname = NULL;
+	}
+
+	if (tree->left && tree->right)
+		check_varnames (tree->left, tree->right);
 
 	return tree;
 }
@@ -805,6 +840,50 @@ emit_kids ()
 }
 
 static void
+emit_tree_variables (char *prefix, int depth, Tree *t)
+{
+	char *tn;
+	int i;
+
+	if (t->varname) {
+		if (with_references) {
+			output ("MBTREE_TYPE &%s = *(%s(&tree))",
+				t->varname, prefix);
+		} else {
+			output ("MBTREE_TYPE *%s = (%s(tree))",
+				t->varname, prefix);
+		}
+
+		for (i = 0; i < depth; ++i)
+			output (")");
+		output (";\n");
+	}
+
+	if (t->left) {
+		tn = g_strconcat ("MBTREE_LEFT(", prefix, NULL);
+		emit_tree_variables (tn, depth + 1, t->left);
+		g_free (tn);
+	}
+
+	if (t->right) {
+		tn = g_strconcat ("MBTREE_RIGHT(", prefix, NULL);
+		emit_tree_variables (tn, depth + 1, t->right);
+		g_free (tn);
+	}
+}
+
+static void
+emit_rule_variables (Rule *rule)
+{
+	Tree *t = rule->tree;
+
+	if (t) {
+		emit_tree_variables ("", 0, t);
+	}
+
+}
+
+static void
 emit_emitter_func ()
 {
 	GList *l;
@@ -836,7 +915,9 @@ emit_emitter_func ()
 			output ("(void) tree; (void) s;");
 			if (dag_mode)
 				output (" (void) state;");
-			output ("\n%s\n", rule->code);
+			output ("\n");
+			emit_rule_variables (rule);
+			output ("%s\n", rule->code);
 			output ("}\n\n");
 			g_hash_table_insert (cache, rule->code, GINT_TO_POINTER (i));
 		}
@@ -1217,7 +1298,9 @@ main (int argc, char *argv [])
 			} else if (argv [i][1] == '-') {
 
 				/* Long options */
-				if (strcmp (argv [i] + 2, "without-glib") == 0) {
+				if (strcmp (argv [i] + 2, "help") == 0) {
+					usage (argv [0]);
+				} else if (strcmp (argv [i] + 2, "without-glib") == 0) {
 					with_glib = FALSE;
 				} else if (strcmp(argv [i] + 2, "version") == 0) {
 					version ();

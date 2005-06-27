@@ -45,6 +45,7 @@ struct _Tree {
 	Term *op;
 	Tree *left;
 	Tree *right;
+	char *varname;
 	NonTerm *nonterm; /* used by chain rules */
 };
 
@@ -68,7 +69,7 @@ struct _File {
 extern File inputs[MAX_FDS];
 
 
-Tree    *create_tree    (char *id, Tree *left, Tree *right);
+Tree    *create_tree    (char *id, char *varname, Tree *left, Tree *right);
 
 Term    *create_term    (char *id, int num);
 

@@ -43,6 +43,7 @@
 %type   <text>          optcost
 %type   <text>          optcfunc
 %type   <text>          optcode
+%type   <text>          optvarname
 %type   <rule>          rule
 %type   <rule_list>     rule_list
 
@@ -89,9 +90,15 @@ tlist	: /* empty */
 	| tlist IDENT '=' INTEGER { create_term ($2, $4); }
 	;
 
-tree	: IDENT { $$ = create_tree ($1, NULL, NULL); }
-	| IDENT '(' tree ')' { $$ = create_tree ($1, $3, NULL); }
-	| IDENT '(' tree ',' tree ')' { $$ = create_tree ($1, $3, $5); }
+tree	: IDENT optvarname {
+			$$ = create_tree ($2 ? $2 : $1, $2 ? $1 : NULL, NULL, NULL);
+		}
+	| IDENT optvarname '(' tree ')' {
+			$$ = create_tree ($2 ? $2 : $1, $2 ? $1 : NULL, $4, NULL);
+		}
+	| IDENT optvarname '(' tree ',' tree ')' {
+			$$ = create_tree ($2 ? $2 : $1, $2 ? $1 : NULL, $4, $6);
+		}
 	;
 
 optcost : /* empty */ {$$ = NULL; }
@@ -102,6 +109,10 @@ optcost : /* empty */ {$$ = NULL; }
 optcfunc : /*empty */ { $$ = NULL; }
 	 | COST CODE { $$ = $2; }
 	 ;
+
+optvarname: /* empty */ { $$ = NULL; }
+	  | ':' IDENT { $$ = $2; }
+
 %%
 
 static char input[2048];

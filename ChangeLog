@@ -1,3 +1,9 @@
+from  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
+	* parser.y: Add parsing of optional `name:' before a rule member.
+	* monoburg.h,
+	* monoburg.c: Add optional rule naming.
+
 2005-06-14  Roland Levillain  <roland@lrde.epita.fr>
 
 	* configure.ac: Bump to 1.0.1a.
