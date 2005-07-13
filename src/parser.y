@@ -1,11 +1,22 @@
 %{
-/*
- * monoburg.y: yacc input grammer
- *
- * Author:
- *   Dietmar Maurer (dietmar@ximian.com)
- *
- * (C) 2001 Ximian, Inc.
+/**
+ ** parser.y: this file is part of MonoBURG.
+ **
+ ** MonoBURG, an iburg like code generator generator.
+ **
+ ** Copyright (C) 2001, 2002, 2004, 2005 Ximian, Inc.
+ **
+ ** This program is free software; you can redistribute it and/or
+ ** modify it under the terms of the GNU General Public License
+ ** as published by the Free Software Foundation; either version 2
+ ** of the License, or (at your option) any later version.
+ **
+ ** The complete GNU General Public Licence Notice can be found as the
+ ** `NOTICE' file in the root directory.
+ **
+ ** \author Dietmar Maurer (dietmar@ximian.com)
+ ** \author Cadilhac Michael (cadilhac@lrde.org)
+ ** \brief Burg files' grammar description.
  */
 
 #include <stdio.h>
@@ -18,6 +29,17 @@
 #include <errno.h>
 
 #include "monoburg.h"
+#include "rule.h"
+#include "parser.h"
+#include "emit.h"
+
+File inputs[MAX_FDS];
+GHashTable *definedvars;
+char *namespaces[MAX_NAMESPACES];
+char **include_dirs;
+
+int n_include_dir = 0;
+int n_namespace = 0;
 
 %}
 
@@ -137,9 +159,9 @@ char *fgets_inc(char *s, int size)
     free (inputs[n_input].filename);
     fclose (inputs[n_input--].fd);
     if (state != 1)
-      fprintf (outputfd, "#line %d \"%s\"\n",
-	       inputs[n_input].yylineno + 1,
-	       inputs[n_input].filename);
+      output ("#line %d \"%s\"\n",
+	      inputs[n_input].yylineno + 1,
+	      inputs[n_input].filename);
     return fgets_inc(s, size);
   }
 
@@ -165,7 +187,7 @@ char *fgets_inc(char *s, int size)
       yyerror ("`%%include %s': %s",
 	       filename, strerror(errno));
     if (state != 1)
-      fprintf (outputfd, "#line %d \"%s\"\n", 1, path);
+      output ("#line %d \"%s\"\n", 1, path);
     inputs[++n_input].yylineno = 0;
     inputs[n_input].filename = strdup (path);
     return fgets_inc(s, size);
@@ -304,7 +326,7 @@ nextchar ()
 	  if (ll) {
 	    next_state = 1;
 	  } else
-	    fputs (input, outputfd);
+	    output ("%s", input);
 	  break;
 	case 1:
 	  if (ll) {
@@ -326,11 +348,11 @@ nextchar ()
 void
 yyparsetail (void)
 {
-  fprintf (outputfd, "#line %d \"%s\"\n", inputs[n_input].yylineno,
-	   inputs[n_input].filename);
-  fputs (input, outputfd);
+  output ("#line %d \"%s\"\n", inputs[n_input].yylineno,
+	  inputs[n_input].filename);
+  output ("%s", input);
   while (fgets_inc (input, sizeof (input)))
-    fputs (input, outputfd);
+    output ("%s", input);
 }
 
 int

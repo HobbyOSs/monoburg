@@ -89,7 +89,7 @@ reduce (MBTree *tree, int goal)
 {
 	MBTree *kids[10];
 	int ern = mono_burg_rule (tree->state, goal);
-	guint16 *nts = mono_burg_nts [ern];
+	const guint16 *nts = mono_burg_nts [ern];
 	int i, n;
 
 	mono_burg_kids (tree, ern, kids);

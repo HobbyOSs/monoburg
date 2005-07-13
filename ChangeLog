@@ -1,3 +1,41 @@
+2005-07-13  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
+	* sample.brg: Move to...
+	* tests/sample.brg: ...Here.
+
+	* parser.y: Move to...
+	* src/parser.y: ...Here.
+	
+	* monoburg.1: Move to...
+	* src/monoburg.1: ...Here.
+	
+	* monoburg.c,
+	* monoburg.h: Split in...
+	* src/emit.c,
+	* src/parser.h,
+	* src/emit.h,
+	* src/rule.c,
+	* src/emit_kids.c,
+	* src/rule.h,
+	* src/check.c,
+	* src/emit_files.c,
+	* src/emit_pretty_print.c,
+	* src/check.h,
+	* src/main.c,
+	* src/emit_cost.c,
+	* src/emit_functions.c,
+	* src/monoburg.h: ...These files.
+	
+	* src/Makefile.am,
+	* tests/Makefile.am: New. Create accordingly.
+	
+	* NOTICE,
+	* AUTHORS,
+	* NEWS: New. Add some package related files.
+	
+	* configure.ac,
+	* Makefile.am: Update accordingly.
+
 2005-06-27  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
 	* configure.ac: Bump to 1.0.2.

@@ -18,7 +18,7 @@ AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_FILES([config/Makefile])
 
 # Initiate automake.
-AM_INIT_AUTOMAKE([foreign 1.7.5 dist-bzip2])
+AM_INIT_AUTOMAKE([1.7.5 dist-bzip2])
 
 ## -------------------------------------
 ## Development tools
@@ -41,6 +41,8 @@ AM_PATH_GLIB_2_0
 # Ask for Makefile creation
 AC_CONFIG_FILES([
   Makefile
+  src/Makefile
+  tests/Makefile
 ])
 
 # Instantiate the output files
