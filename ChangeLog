@@ -1,3 +1,11 @@
+2005-08-31  Akim Demaille  <akim@epita.fr>
+
+	-I is not honored.
+
+	* src/main.c: It seems that the values passed to the option
+	processing callback of g_option_context_parse are not persistent.
+	So use strdup/free for these values.
+
 2005-07-13  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
 	* sample.brg: Move to...
@@ -5,10 +13,10 @@
 
 	* parser.y: Move to...
 	* src/parser.y: ...Here.
-	
+
 	* monoburg.1: Move to...
 	* src/monoburg.1: ...Here.
-	
+
 	* monoburg.c,
 	* monoburg.h: Split in...
 	* src/emit.c,
@@ -25,14 +33,14 @@
 	* src/emit_cost.c,
 	* src/emit_functions.c,
 	* src/monoburg.h: ...These files.
-	
+
 	* src/Makefile.am,
 	* tests/Makefile.am: New. Create accordingly.
-	
+
 	* NOTICE,
 	* AUTHORS,
 	* NEWS: New. Add some package related files.
-	
+
 	* configure.ac,
 	* Makefile.am: Update accordingly.
 
@@ -123,9 +131,9 @@
 	verbatim. Syntax is:
 	%include filename
 	without double quote or anything.
-	
+
 	This directive could be used anywhere.
-	
+
 	* parser.y (yyerror):   Enhance    verbosity   on   error  message
 	accordingly.
 
@@ -140,16 +148,16 @@
 	%namespace namespace1_name
 	%namespace namespace2_name
 	without double quote or anything.
-	
+
 	This directive  can only be  used in the  `rule' part of  the burg
 	file.
 
 	The user is warned that  the code produced will only be compilable
 	with a C++ compiler.
-	
+
 	* parser.y (yylex):  Remove  a warning  when comparing  a `sizeof'
 	with an int.
-	
+
 	* monoburg.c,
 	* monoburg.h: Add `%namespace' handling.
 
@@ -158,11 +166,11 @@
 	* monoburg.c:  Add   a  `--with-references'   option  which  makes
 	monoburg to  produce `mono_burg_emit_*' functions  that takes tree
 	as a `MBTREE&'.
-	
+
 	The user is warned that the code produced will only be compilable
 	with a C++ compiler.
-	
-	* monoburg.c (emit_emmitter_func): Add fake use of arguments of 
+
+	* monoburg.c (emit_emmitter_func): Add fake use of arguments of
 	`emit' functions produced to avoid `unused parameter' warning when
 	compiling output.
 
@@ -198,8 +206,8 @@
 
 2004-11-07  Benoit Perrot <benoit@lrde.epita.fr>
 
-	* monoburg.c (emit_state): Do not forward define MBState type. 
-	
+	* monoburg.c (emit_state): Do not forward define MBState type.
+
 2004-11-07  Benoit Perrot <benoit@lrde.epita.fr>
 
 	* monoburg.c: Do not emit debug string tables when
@@ -221,7 +229,7 @@
 
 2004-10-13  Benoit Perrot <benoit@lrde.epita.fr>
 
-	* monoburg.c: Emit code to generate a file that does not need glib to 
+	* monoburg.c: Emit code to generate a file that does not need glib to
 	compile. Add `-g' option to control this emission.
 
 2004-10-06  Benoit Perrot <benoit@lrde.epita.fr>
@@ -237,7 +245,7 @@
 2004-06-24  David Waite  <mass@akuma.org>
 
 	* monoburg.c: change to C90-style comments from C99/C++-style
-	
+
 Wed Apr 14 12:40:54 CEST 2004 Paolo Molaro <lupus@ximian.com>
 
 	* monoburg.c, monoburg.h, monoburg.y: changed the grammar so that
@@ -319,7 +327,7 @@ Fri Feb 1 15:14:16 CET 2002 Paolo Molaro <lupus@ximian.com>
 
 2001-09-23  Dietmar Maurer  <dietmar@ximian.com>
 
-	* monoburg.c: add a macro MBALLOC_STATE to define the allocation 
+	* monoburg.c: add a macro MBALLOC_STATE to define the allocation
 	function for MBState. Added an additional user data argument to
 	mono_burg_label - the data can be used in the cost functions. The
 	type can be defined with MBCOST_DATA macro.
@@ -365,7 +373,7 @@ Mon Sep 10 17:24:45 CEST 2001 Paolo Molaro <lupus@ximian.com>
 
 	* Makefile.am: change CLEANFILES line to use just '=' instead of '+='
 		some versions of automake complain if you try to '+=' before you '='
-		
+
 2001-09-08  Dietmar Maurer  <dietmar@ximian.com>
 
 	* monoburg.c (emit_header): added some convenient macros
@@ -375,4 +383,3 @@ Mon Sep 10 17:24:45 CEST 2001 Paolo Molaro <lupus@ximian.com>
 2001-09-06  Dietmar Maurer  <dietmar@ximian.com>
 
 	* monoburg.c (emit_header): use macros to access the tree (like in iburg)
-

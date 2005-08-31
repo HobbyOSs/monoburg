@@ -53,7 +53,7 @@ GOPTION_CALLBACK (add_to_defined_vars,
 GOPTION_CALLBACK (add_to_include_dirs,
 		  if (n_include_dir % 10 == 0)
 			  include_dirs = g_renew (char *, include_dirs, n_include_dir + 10);
-		  include_dirs [n_include_dir++] = (char *) value;
+		  include_dirs [n_include_dir++] = (char *) g_strdup (value);
 		  return TRUE);
 
 GOPTION_CALLBACK (version,
@@ -140,7 +140,7 @@ int main (int argc, char **argv)
 	/* Initialize vars. */
 	definedvars = g_hash_table_new (g_str_hash, g_str_equal);
 	include_dirs = g_new (char *, 10);
-	include_dirs[n_include_dir++] = ".";
+	include_dirs[n_include_dir++] = g_strdup (".");
 
 	/* Parse options. */
 	g_option_context_add_main_entries (context, option_entries, NULL);
@@ -244,6 +244,11 @@ int main (int argc, char **argv)
 		fclose (cfd);
 
 	/* Aren't we clean ? */
+	{
+	  int i;
+	  for (i = 0; i < n_include_dir; ++i)
+	    g_free (include_dirs[i]);
+	}
 	g_free (include_dirs);
 	return 0;
 }
