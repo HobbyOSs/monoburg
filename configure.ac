@@ -2,9 +2,9 @@
 ## Configure MonoBURG, an IBurg-like code generator generator
 ##
 
-## ------------------------------------- 
+## -------------------------------------
 ## Project
-AC_INIT([MonoBURG], [1.0.2])
+AC_INIT([MonoBURG], [1.0.2a])
 AM_CONFIG_HEADER([config.h])
 
 ## -------------------------------------
@@ -18,7 +18,7 @@ AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_FILES([config/Makefile])
 
 # Initiate automake.
-AM_INIT_AUTOMAKE([1.7.5 dist-bzip2])
+AM_INIT_AUTOMAKE([1.7.5 dist-bzip2 check-news])
 
 ## -------------------------------------
 ## Development tools
