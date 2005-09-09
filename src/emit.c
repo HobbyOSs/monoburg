@@ -432,13 +432,17 @@ void emit_label_func ()
 static char *compute_nonterms (Tree *tree)
 {
 	if (!tree)
-		return "";
+		return g_strdup ("");
 
 	if (tree->nonterm) {
 		return g_strdup_printf ("MB_NTERM_%s, ", tree->nonterm->name);
 	} else {
-		return g_strconcat (compute_nonterms (tree->left),
-				    compute_nonterms (tree->right), NULL);
+		char *s_left = compute_nonterms (tree->left);
+		char *s_right = compute_nonterms (tree->right);
+		char *s_result = g_strconcat (s_left, s_right, NULL);
+		g_free (s_left);
+		g_free (s_right);
+		return s_result;
 	}
 }
 
@@ -520,6 +524,8 @@ void emit_vardefs ()
 		if (j == c) {
 			output ("static const guint16 mono_burg_nts_%d [] = { %s0 };\n", c, s);
 			sa [c++] = s;
+		} else {
+			g_free (s);
 		}
 	}
 	output ("\n");
@@ -533,6 +539,11 @@ void emit_vardefs ()
 		output ("\tmono_burg_nts_%d, ", si [i++]);
 		emit_rule_string (rule, "");
 	}
+	while (c--)
+		g_free (sa [c]);
+	g_free (sa);
+	g_free (si);
+
 	output ("};\n\n");
 }
 

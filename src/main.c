@@ -269,5 +269,25 @@ int main (int argc, char **argv)
 	if (cfile)
 		fclose (cfd);
 
+	/* Memory: ``Free me, I'm famous !''. */
+	g_hash_table_destroy (definedvars);
+	{
+		GList *include_dir;
+		for (include_dir = include_dirs->next;
+		     include_dir; include_dir = include_dir->next) {
+			g_free (include_dir->data);
+			include_dir = include_dir->next;
+		}
+	}
+	g_list_free (include_dirs);
+#ifndef NDEBUG
+	g_list_pop_allocator ();
+	g_allocator_free (list_allocator);
+#endif
+
+	/* Remove log handler. */
+	g_log_remove_handler (NULL, handler_id);
+	g_free (g_get_prgname ());
+
 	return 0;
 }

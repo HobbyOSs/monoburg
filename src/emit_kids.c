@@ -95,6 +95,8 @@ void emit_kids ()
 		si [i++] = j;
 		if (j == c)
 			sa [c++] = k;
+		else
+			g_free (k);
 	}
 
 	for (i = 0; i < c; i++) {
@@ -104,6 +106,10 @@ void emit_kids ()
 		output ("%s", sa [i]);
 		output ("\t\tbreak;\n");
 	}
+	while (c--)
+		g_free (sa [c]);
+	g_free (sa);
+	g_free (si);
 
 	output ("\tdefault:\n\t\tg_assert_not_reached ();\n");
 	output ("\t}\n");
@@ -122,23 +128,35 @@ static char *compute_kids (char *ts, Tree *tree, int *n)
 		return g_strdup_printf ("\t\tkids[%d] = %s;\n", (*n)++, ts);
 	} else if (tree->op && tree->op->arity) {
 		char *res2 = NULL;
+		char *tmp;
+		char *result;
 
 		if (dag_mode) {
-			res = compute_kids (g_strdup_printf ("%s->left", ts),
-					    tree->left, n);
-			if (tree->op->arity == 2)
-				res2 = compute_kids (g_strdup_printf ("%s->right", ts),
-						     tree->right, n);
+			tmp = g_strdup_printf ("%s->left", ts);
+			res = compute_kids (tmp, tree->left, n);
+			g_free (tmp);
+			if (tree->op->arity == 2) {
+				tmp = g_strdup_printf ("%s->right", ts);
+				res2 = compute_kids (tmp, tree->right, n);
+				g_free (tmp);
+			}
 		} else {
-			res = compute_kids (g_strdup_printf ("MBTREE_LEFT(%s)", ts),
-					    tree->left, n);
+			tmp = g_strdup_printf ("MBTREE_LEFT(%s)", ts);
+			res = compute_kids (tmp, tree->left, n);
+			g_free (tmp);
 			if (tree->op->arity == 2)
-				res2 = compute_kids (g_strdup_printf ("MBTREE_RIGHT(%s)", ts),
-						     tree->right, n);
+			{
+				tmp = g_strdup_printf ("MBTREE_RIGHT(%s)", ts);
+				res2 = compute_kids (tmp, tree->right, n);
+				g_free (tmp);
+			}
 		}
 
-		return g_strconcat (res, res2, NULL);
+		result = g_strconcat (res, res2, NULL);
+		g_free (res);
+		g_free (res2);
+		return result;
 	}
-	return "";
+	return g_strdup ("");
 }
 

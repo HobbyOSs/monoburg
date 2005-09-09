@@ -106,6 +106,7 @@ void emit_costs (char *st, Tree *t)
 		if (t->right) {
 			tn = g_strconcat (st, "right->", NULL);
 			emit_costs (tn, t->right);
+			g_free (tn);
 		}
 	} else
 		output ("%scost[MB_NTERM_%s] + ", st, t->nonterm->name);

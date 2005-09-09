@@ -45,27 +45,25 @@ Rule *make_rule (char *id, Tree *tree)
 
 void rule_add (Rule *rule, char *code, char *cost, char *cfunc)
 {
-	if (!cfunc && !cost)
-		cost = g_strdup_printf ("%d", default_cost);
-
 	rule_list = g_list_append (rule_list, rule);
-	rule->cost = g_strdup (cost);
-	rule->cfunc = g_strdup (cfunc);
-	rule->code = g_strdup (code);
+
+	rule->cfunc = cfunc;
+	rule->code = code;
 
 	if (cfunc) {
 		if (cost)
 			yyerror ("duplicated costs (constant costs and cost function)");
-		else {
-			if (dag_mode)
-				rule->cost = g_strdup_printf ("mono_burg_cost_%d (p, data)",
-							      g_list_length (rule_list));
-			else
-				rule->cost = g_strdup_printf ("mono_burg_cost_%d (tree, data)",
-							      g_list_length (rule_list));
-		}
+		if (dag_mode)
+			rule->cost = g_strdup_printf ("mono_burg_cost_%d (p, data)",
+						      g_list_length (rule_list));
+		else
+			rule->cost = g_strdup_printf ("mono_burg_cost_%d (tree, data)",
+						      g_list_length (rule_list));
+	} else if (cost) {
+		rule->cost = cost;
+	} else {
+		rule->cost = g_strdup_printf ("%d", default_cost);
 	}
-
 	rule->lhs->rules = g_list_append (rule->lhs->rules, rule);
 
 	if (rule->tree->op)
@@ -146,6 +144,7 @@ Tree *create_tree (char *id, char *varname, Tree *left, Tree *right)
 		tree->op = term;
 		tree->left = left;
 		tree->right = right;
+		g_free (id);
 	} else {
 		tree->nonterm = nonterm (id);
 	}
@@ -155,7 +154,7 @@ Tree *create_tree (char *id, char *varname, Tree *left, Tree *right)
 			check_varname (varname, tree->left);
 		if (tree->right)
 			check_varname (varname, tree->right);
-		tree->varname = g_strdup (varname);
+		tree->varname = varname;
 	} else {
 		tree->varname = NULL;
 	}
@@ -177,7 +176,7 @@ void create_term_prefix (char *id)
 	if (!predefined_terms)
 		yyerror ("%termprefix is only available with -p option");
 
-	prefix_list = g_list_prepend (prefix_list, g_strdup (id));
+	prefix_list = g_list_prepend (prefix_list, id);
 }
 
 Term *create_term (char *id, int num)
@@ -197,7 +196,7 @@ Term *create_term (char *id, int num)
 
 	term = g_new0 (Term, 1);
 
-	term->name = g_strdup (id);
+	term->name = id;
 	term->number = num;
 	term->arity = -1;
 
@@ -216,11 +215,14 @@ static NonTerm *nonterm (char *id)
 		nonterm_hash = g_hash_table_new (g_str_hash, g_str_equal);
 
 	if ((nterm = g_hash_table_lookup (nonterm_hash, id)))
+	{
+		g_free (id);
 		return nterm;
+	}
 
 	nterm = g_new0 (NonTerm, 1);
 
-	nterm->name = g_strdup (id);
+	nterm->name = id;
 	nonterm_list = g_list_append (nonterm_list, nterm);
 	nterm->number = g_list_length (nonterm_list);
 
@@ -238,4 +240,90 @@ void start_nonterm (char *id)
 
 	start_def = TRUE;
 	nonterm (id);
+}
+
+void free_tree (Tree *tree)
+{
+	if (!tree)
+		return;
+	g_free (tree->varname);
+	free_tree (tree->left);
+	free_tree (tree->right);
+	g_free (tree);
+}
+
+static void free_prefix ()
+{
+	GList *prefix;
+	for (prefix = prefix_list; prefix; prefix = prefix->next) {
+		g_free (prefix->data);
+	}
+	g_list_free (prefix);
+}
+
+static void free_rules_prevent_refree (Rule *rule, GList *rule_list)
+{
+	char *cost = rule->cost;
+	char *cfunc = rule->cfunc;
+	char *code = rule->code;
+	Tree *tree = rule->tree;
+
+	for (; rule_list; rule_list = rule_list->next) {
+		rule = (Rule *) rule_list->data;
+		if (cost == rule->cost)
+			rule->cost = NULL;
+		if (cfunc == rule->cfunc)
+			rule->cfunc = NULL;
+		if (code == rule->code)
+			rule->code = NULL;
+		if (tree == rule->tree)
+			rule->tree = NULL;
+	}
+}
+
+void free_rules ()
+{
+	GList *rule;
+	Rule *p_rule;
+	for (rule = rule_list; rule; rule = rule->next ) {
+		p_rule = (Rule *) rule->data;
+		free_rules_prevent_refree (p_rule, rule->next);
+		g_free (p_rule->cost);
+		g_free (p_rule->cfunc);
+		g_free (p_rule->code);
+		free_tree (p_rule->tree);
+		g_free (p_rule);
+	}
+	g_list_free (rule_list);
+
+	free_prefix ();
+}
+
+void free_terms ()
+{
+	GList *term;
+	Term *p_term;
+	for (term = term_list; term; term = term->next) {
+		p_term = (Term *) term->data;
+		g_free (p_term->name);
+		g_list_free (p_term->rules);
+		g_free (p_term);
+	}
+	g_list_free (term_list);
+	g_hash_table_destroy (term_hash);
+}
+
+void free_nonterms ()
+{
+	GList *nonterm = nonterm_list;
+	NonTerm *p_nonterm;
+	for (nonterm = nonterm_list; nonterm; nonterm = nonterm->next) {
+		p_nonterm = (NonTerm *) nonterm->data;
+		g_free (p_nonterm->name);
+		g_list_free (p_nonterm->chain);
+		g_list_free (p_nonterm->rules);
+		g_free (p_nonterm);
+	}
+	g_list_free (nonterm_list);
+	g_hash_table_destroy (nonterm_hash);
 }

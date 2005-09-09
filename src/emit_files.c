@@ -67,4 +67,7 @@ void emit_code_file ()
 	emit_kids ();
 	while (n_namespace--)
 	  output ("}\n");
+	free_rules ();
+	free_terms ();
+	free_nonterms ();
 }

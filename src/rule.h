@@ -75,4 +75,8 @@ void     start_nonterm  (char *id);
 Rule    *make_rule      (char *id, Tree *tree);
 void     rule_add       (Rule *rule, char *code, char *cost, char *cfunc);
 
+void	 free_rules ();
+void	 free_terms ();
+void	 free_nonterms ();
+
 #endif /* __MONO_RULE_H__ */

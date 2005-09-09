@@ -118,7 +118,7 @@ tree	: IDENT optvarname {
 	;
 
 optcost : /* empty */ {$$ = NULL; }
-	| STRING
+	| STRING { $$ = g_strdup ($1); }
 	| INTEGER { $$ = g_strdup_printf ("%d", $1); }
 	;
 
