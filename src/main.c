@@ -32,6 +32,7 @@ static char *header_define = NULL;
 static char *cfile = NULL;
 static char *deffile = NULL;
 static GList *infiles = NULL;
+gboolean with_line = FALSE;
 gboolean with_glib = TRUE;
 gboolean with_exported_symbols = TRUE;
 gboolean with_references = FALSE;
@@ -118,6 +119,8 @@ static void parse_options (int argc, char **argv)
 		  "Set FILE to be the output source code file.", "FILE" },
 		{ "version", 'v', 0, G_OPTION_ARG_NONE, &version,
 		  "Output version number and quit.", NULL },
+		{ "with-line", 'l', 0, G_OPTION_ARG_NONE, &with_line,
+		  "Output `#line' directives.", NULL },
 		{ "without-glib", 0, 0, G_OPTION_ARG_NONE, &without_glib,
 		  "Output a glib independent code.", NULL },
 		{ "without-exported-symbols", 0, 0, G_OPTION_ARG_NONE, &without_exported_symbols,
@@ -201,8 +204,8 @@ int main (int argc, char **argv)
 				exit (-1);
 			}
 			input.filename = infile;
-
-			output ("#line %d \"%s\"\n", 1, infile);
+			if (with_line)
+				output ("#line %d \"%s\"\n", 1, infile);
 			yyparse ();
 
 			reset_parser ();

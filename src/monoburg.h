@@ -25,6 +25,7 @@
 # include <config.h>
 # include <glib.h>
 
+extern gboolean with_line;
 extern gboolean with_glib;
 extern gboolean with_exported_symbols;
 extern gboolean with_references;

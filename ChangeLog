@@ -1,5 +1,12 @@
 2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* src/monoburg.h: Add a `with_line' variable which tells if
+	`#line' directives have to be output.
+	* src/main.c (parse_options): Parse the option.
+	* src/parser.y: Output `#line' directives accordingly.
+
+2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* src/parser.h: Use `GList' for namespaces and include related
 	features.
 	* src/emit_files.c,

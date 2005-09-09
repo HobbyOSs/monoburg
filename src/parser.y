@@ -158,7 +158,7 @@ fgets_inc(char *s, int size)
     free (LASTINPUT->filename);
     fclose (LASTINPUT->fd);
     inputs = g_list_delete_link (inputs, g_list_last (inputs));
-    if (state != 1)
+    if (state != 1 && with_line)
       output ("#line %d \"%s\"\n",
 	      LASTINPUT->yylineno + 1,
 	      LASTINPUT->filename);
@@ -192,7 +192,7 @@ fgets_inc(char *s, int size)
       yyerror ("`%%include %s': %s",
 	       filename, strerror(errno));
     }
-    if (state != 1)
+    if (state != 1 && with_line)
       output ("#line %d \"%s\"\n", 1, path);
     new_include->yylineno = 0;
     new_include->filename = strdup (path);
@@ -356,8 +356,9 @@ nextchar ()
 void
 yyparsetail (void)
 {
-  output ("#line %d \"%s\"\n", LASTINPUT->yylineno,
-	  LASTINPUT->filename);
+  if (with_line)
+    output ("#line %d \"%s\"\n", LASTINPUT->yylineno,
+	    LASTINPUT->filename);
   while (fgets_inc (input, sizeof (input)))
     output ("%s", input);
 }
@@ -447,8 +448,9 @@ yylex (void)
       unsigned i = 0, d = 1;
       static char buf [100000];
 
-      i = sprintf (buf, "#line %d \"%s\"\n", LASTINPUT->yylineno,
-		   LASTINPUT->filename);
+      if (with_line)
+	i = sprintf (buf, "#line %d \"%s\"\n", LASTINPUT->yylineno,
+		     LASTINPUT->filename);
       while (d && (c = nextchar ())) {
 	buf [i++] = c;
 	assert (i < sizeof (buf));
