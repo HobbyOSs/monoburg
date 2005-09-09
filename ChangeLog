@@ -1,5 +1,12 @@
 2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* tests/Makefile.am: Add test facilities.
+	* tests/sample.c.ref: New. Add reference code for
+	tests/sample.brg.
+	
+
+2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* src/emit.c,
 	* src/rule.c,
 	* src/emit_kids.c,
