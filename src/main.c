@@ -276,7 +276,6 @@ int main (int argc, char **argv)
 		for (include_dir = include_dirs->next;
 		     include_dir; include_dir = include_dir->next) {
 			g_free (include_dir->data);
-			include_dir = include_dir->next;
 		}
 	}
 	g_list_free (include_dirs);

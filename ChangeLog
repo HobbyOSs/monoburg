@@ -1,5 +1,10 @@
 2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* configure.ac,
+	* NEWS: Bump to 1.0.2b.
+
+2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* src/monoburg.1: Remove. Move to...
 	* man/monoburg.1: New. ... here and update.
 	* src/Makefile.am: Delete man reference.

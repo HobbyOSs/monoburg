@@ -1,3 +1,17 @@
+* 1.0.2b
+
+** Add --with-line option
+
+  Output of `#line' directives is now conditioned by this option.
+
+** Clean memory use
+
+  Memory leaks has been shooted.
+
+** Remove limits on some features
+
+  Depths of `%namespace' and `%include' are no more limited.
+
 * 1.0.2a
 
 ** Reoganization of the sources
