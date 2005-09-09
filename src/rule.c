@@ -31,6 +31,9 @@ GList *rule_list = NULL;
 GList *prefix_list = NULL;
 int default_cost = 0;
 
+static NonTerm *nonterm (char *id);
+
+
 Rule *make_rule (char *id, Tree *tree)
 {
 	Rule *rule = g_new0 (Rule, 1);
@@ -69,13 +72,6 @@ void rule_add (Rule *rule, char *code, char *cost, char *cfunc)
 		rule->tree->op->rules = g_list_append (rule->tree->op->rules, rule);
 	else
 		rule->tree->nonterm->chain = g_list_append (rule->tree->nonterm->chain, rule);
-}
-
-void create_rule (char *id, Tree *tree, char *code, char *cost, char *cfunc)
-{
-	Rule *rule = make_rule (id, tree);
-
-	rule_add (rule, code, cost, cfunc);
 }
 
 static void check_varname (char *varname, Tree *t)
@@ -195,7 +191,7 @@ Term *create_term (char *id, int num)
 		yyerror ("invalid terminal number %d", num);
 
 	if (!term_hash)
-		term_hash = g_hash_table_new (g_str_hash , g_str_equal);
+		term_hash = g_hash_table_new (g_str_hash, g_str_equal);
 
 	g_hash_table_foreach (term_hash, (GHFunc) check_term_num, (gpointer) num);
 
@@ -212,12 +208,12 @@ Term *create_term (char *id, int num)
 	return term;
 }
 
-NonTerm *nonterm (char *id)
+static NonTerm *nonterm (char *id)
 {
 	NonTerm *nterm;
 
 	if (!nonterm_hash)
-		nonterm_hash = g_hash_table_new (g_str_hash , g_str_equal);
+		nonterm_hash = g_hash_table_new (g_str_hash, g_str_equal);
 
 	if ((nterm = g_hash_table_lookup (nonterm_hash, id)))
 		return nterm;

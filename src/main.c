@@ -28,6 +28,10 @@
 #include "emit.h"
 
 static gboolean quiet = FALSE;
+static char *header_define = NULL;
+static char *cfile = NULL;
+static char *deffile = NULL;
+static GList *infiles = NULL;
 gboolean with_glib = TRUE;
 gboolean with_exported_symbols = TRUE;
 gboolean with_references = FALSE;
@@ -41,12 +45,12 @@ gboolean predefined_terms = 0;
 	{							\
 		(void) data; (void) error;			\
 		(void) option_name; (void) value;		\
-		Code;						\
+		{ Code; }					\
 	}
 
 
 GOPTION_CALLBACK (add_to_defined_vars,
-		  g_hash_table_insert (definedvars, (char *) value,
+		  g_hash_table_insert (definedvars, g_strdup (value),
 				       GUINT_TO_POINTER (1));
 		  return TRUE;);
 
@@ -55,10 +59,6 @@ GOPTION_CALLBACK (add_to_include_dirs,
 			  include_dirs = g_renew (char *, include_dirs, n_include_dir + 10);
 		  include_dirs [n_include_dir++] = (char *) g_strdup (value);
 		  return TRUE);
-
-GOPTION_CALLBACK (version,
-		  printf ("%s\n", PACKAGE_STRING);
-		  exit (0));
 
 static void bad_use (const char *program_name, const char *use)
 {
@@ -89,28 +89,23 @@ static void warning_handler (const gchar *log_domain,
 	(void) fprintf ((FILE *) user_data, "** WARNING **: %s\n", message);
 }
 
-
-int main (int argc, char **argv)
+static void parse_options (int argc, char **argv)
 {
-	FILE *deffd = 0;
-	FILE *cfd = 0;
-	static char *header_define = NULL;
-	static char *cfile = NULL;
-	static char *deffile = NULL;
 	static gboolean without_glib = FALSE;
 	static gboolean without_exported_symbols = FALSE;
-	GList *infiles = NULL;
+	static gboolean version = FALSE;
 	int i;
 	GError *error = NULL;
 	GOptionContext* context = g_option_context_new ("- Generate a code generator. If no file is precised, "
 							"the standard input will be processed.");
+
 	static GOptionEntry option_entries[] = {
 		{ "cost", 'c', 0, G_OPTION_ARG_INT, &default_cost,
 		  "Set the default cost to VALUE.", "VALUE" },
 		{ "header-file", 'd', 0, G_OPTION_ARG_FILENAME, &deffile,
 		  "FILE will be the header file.", "FILE" },
 		{ "define", 'D', 0, G_OPTION_ARG_CALLBACK, &add_to_defined_vars,
-		  "VAR will be defined to 1.", "VAR" },
+		  "SYM will be defined to 1.", "SYM" },
 		{ "dag", 'e', 0, G_OPTION_ARG_NONE, &dag_mode,
 		  "Enable DAG compatibility.", NULL },
 		{ "include-dir", 'I', 0, G_OPTION_ARG_CALLBACK, &add_to_include_dirs,
@@ -123,7 +118,7 @@ int main (int argc, char **argv)
 		  "Do not output warning messages.", NULL },
 		{ "source-file", 's', 0, G_OPTION_ARG_FILENAME, &cfile,
 		  "Set FILE to be the output source code file.", "FILE" },
-		{ "version", 'v', 0, G_OPTION_ARG_CALLBACK, &version,
+		{ "version", 'v', 0, G_OPTION_ARG_NONE, &version,
 		  "Output version number and quit.", NULL },
 		{ "without-glib", 0, 0, G_OPTION_ARG_NONE, &without_glib,
 		  "Output a glib independent code.", NULL },
@@ -134,17 +129,14 @@ int main (int argc, char **argv)
 		{ NULL, 0, 0, 0, NULL, NULL, NULL }
 	};
 
-	/* GLib log handler. */
-	g_log_set_handler (NULL, G_LOG_LEVEL_WARNING, warning_handler, stderr);
-
-	/* Initialize vars. */
-	definedvars = g_hash_table_new (g_str_hash, g_str_equal);
-	include_dirs = g_new (char *, 10);
-	include_dirs[n_include_dir++] = g_strdup (".");
-
-	/* Parse options. */
 	g_option_context_add_main_entries (context, option_entries, NULL);
 	g_option_context_parse (context, &argc, &argv, &error);
+	g_option_context_free (context);
+	if (version)
+	{
+		printf ("%s\n", PACKAGE_STRING);
+		exit (0);
+	}
 	if (error)
 		bad_use (argv[0], error->message);
 	if ((cfile && !deffile) || (!cfile && deffile))
@@ -152,9 +144,37 @@ int main (int argc, char **argv)
 	with_glib = !without_glib;
 	with_exported_symbols = !without_exported_symbols;
 	if (with_references)
+	{
 		warn_cxx ("`--with-references' option");
+		g_hash_table_insert (definedvars, g_strdup ("__WITH_REFERENCES"),
+				     GUINT_TO_POINTER (1));
+	}
 	for (i = 1; i < argc; ++i)
 		infiles = g_list_append (infiles, argv[i]);
+}
+
+int main (int argc, char **argv)
+{
+	FILE *deffd = 0;
+	FILE *cfd = 0;
+	guint handler_id;
+#ifndef NDEBUG
+	GAllocator *list_allocator;
+#endif
+
+	/* GLib log handler. */
+	handler_id = g_log_set_handler (NULL, G_LOG_LEVEL_WARNING, warning_handler, stderr);
+
+#ifndef NDEBUG
+	/* Install our allocator, to ease leak detection. */
+	list_allocator = g_allocator_new ("List Allocator", 1024);
+	g_list_push_allocator (list_allocator);
+#endif
+
+	/* Initialize vars. */
+	definedvars = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+	include_dirs = g_list_append (include_dirs, ".");
+	parse_options (argc, argv);
 
 	/* Start header file. */
 	if (deffile) {
@@ -243,12 +263,5 @@ int main (int argc, char **argv)
 	if (cfile)
 		fclose (cfd);
 
-	/* Aren't we clean ? */
-	{
-	  int i;
-	  for (i = 0; i < n_include_dir; ++i)
-	    g_free (include_dirs[i]);
-	}
-	g_free (include_dirs);
 	return 0;
 }

@@ -143,7 +143,8 @@ static int n_input = 0;
 static int state = 0;
 
 
-char *fgets_inc(char *s, int size)
+char *
+fgets_inc(char *s, int size)
 {
   int n_length, i;
   char filename[MAX_FILENAME_LEN];
@@ -332,6 +333,7 @@ nextchar ()
 	  if (ll) {
 	    next_state = 2;
 	    *next = 0;
+	    return 0;
 	  }
 	  break;
 	default:
@@ -339,7 +341,7 @@ nextchar ()
 	}
 	ll = state != 1 || input[0] == '#';
 	state = next_state;
-      } while (next_state == 2 || ll);
+      } while (ll);
     }
 
     return *next++;
@@ -350,7 +352,6 @@ yyparsetail (void)
 {
   output ("#line %d \"%s\"\n", inputs[n_input].yylineno,
 	  inputs[n_input].filename);
-  output ("%s", input);
   while (fgets_inc (input, sizeof (input)))
     output ("%s", input);
 }

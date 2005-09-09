@@ -51,7 +51,7 @@ void emit_cost_func ()
 				output ("(void) state;\n");
 			else
 				output ("(void) tree;\n");
-			output ("%s\n", rule->cfunc);
+			output ("\t{\n%s\n\t}\n", rule->cfunc);
 			output ("}\n\n");
 		}
 		i++;

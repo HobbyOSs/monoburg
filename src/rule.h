@@ -71,11 +71,8 @@ Tree    *create_tree    (char *id, char *varname, Tree *left, Tree *right);
 Term    *create_term    (char *id, int num);
 void     create_term_prefix (char *id);
 GList	*rule_list_prepend (GList *list, Rule *rule);
-NonTerm *nonterm        (char *id);
 void     start_nonterm  (char *id);
 Rule    *make_rule      (char *id, Tree *tree);
 void     rule_add       (Rule *rule, char *code, char *cost, char *cfunc);
-void     create_rule    (char *id, Tree *tree, char *code, char *cost,
-			 char *cfunc);
 
 #endif /* __MONO_RULE_H__ */

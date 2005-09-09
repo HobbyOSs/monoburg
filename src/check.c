@@ -36,7 +36,8 @@ void check_result ()
 			g_warning ("unused terminal \"%s\"",term->name);
 	}
 
-	check_reach (((NonTerm *)nonterm_list->data));
+	if (nonterm_list)
+	  check_reach (((NonTerm *)nonterm_list->data));
 
 	for (l = nonterm_list; l; l = l->next) {
 		NonTerm *n = (NonTerm *)l->data;

@@ -53,12 +53,12 @@ void emit_emitter_func ()
 					(with_references ? '&' : '*'));
 
 			output ("{\n");
-			output ("(void) tree; (void) s;");
+			output ("\t(void) tree; (void) s;");
 			if (dag_mode)
 				output (" (void) state;");
-			output ("\n");
+			output ("\n\t{\n");
 			emit_rule_variables (rule);
-			output ("%s\n", rule->code);
+			output ("%s\n\t}\n", rule->code);
 			output ("}\n\n");
 			g_hash_table_insert (cache, rule->code, GINT_TO_POINTER (i));
 		}

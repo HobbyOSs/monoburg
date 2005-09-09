@@ -1,3 +1,19 @@
+2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
+	* NOTICE: Correct information.
+	* src/rule.c,
+	* src/rule.h: Clean code.
+	* src/check.c: Check if `nonterm_list' is not empty before
+	accessing its first element.
+	* src/parser.y: Fix minor bug when more than one file is
+	processed.
+	* src/main.c: Fix minor bug with `--version' and put option
+	parsing in a single function.
+	* src/main.c (main): Ease memory leak detection by using a
+	programmer-level allocator for list.
+	* src/emit_functions.c,
+	* src/emit_cost.c: Output C90 compliant code.
+
 2005-09-01  Akim Demaille  <akim@epita.fr>
 
 	* configure.ac: Bump to 1.0.2a.
