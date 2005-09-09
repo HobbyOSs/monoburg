@@ -12,5 +12,5 @@
 ## The complete GNU General Public Licence Notice can be found as the
 ## `NOTICE' file in the root directory.
 
-SUBDIRS = src config tests man
-EXTRA_DIST = bootstrap ChangeLog NOTICE
+man_MANS = monoburg.1
+EXTRA_DIST = $(man_MANS)

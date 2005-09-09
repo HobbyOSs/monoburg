@@ -1,5 +1,15 @@
 2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* src/monoburg.1: Remove. Move to...
+	* man/monoburg.1: New. ... here and update.
+	* src/Makefile.am: Delete man reference.
+	* man/Makefile.am: New.	Created accordingly.
+	* man: New. Man path.
+	* configure.ac: Update accordingly.
+	* Makefile.am: Update accordingly.
+
+2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* tests/Makefile.am: Add test facilities.
 	* tests/sample.c.ref: New. Add reference code for
 	tests/sample.brg.

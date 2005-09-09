@@ -1,0 +1,161 @@
+.\" monoburg.1: this file is part of MonoBURG.
+.\"
+.\" MonoBURG, an iburg like code generator generator.
+.\"
+.\" Copyright (C) 2001, 2002, 2004, 2005 Ximian, Inc.
+.\"
+.\" This program is free software; you can redistribute it and/or
+.\" modify it under the terms of the GNU General Public License
+.\" as published by the Free Software Foundation; either version 2
+.\" of the License, or (at your option) any later version.
+.\"
+.\" The complete GNU General Public Licence Notice can be found as the
+.\" `NOTICE' file in the root directory.
+.TH Mono "monoburg"
+.SH NAME
+monoburg \- Code generator generator
+.SH SYNOPSIS
+.PP
+.B monoburg
+[options]
+[file...]
+.SH DESCRIPTION
+The \fImonoburg\fP program is used to generate tree pattern matchers 
+from BURG specifications. \fImonoburg\fP accepts the following EBNF grammar.
+.PP
+.nf
+.RS
+.ft CW
+spec:      ccode `%%' { dcl } [`%%' ccode]
+
+dcl:       `%start' nonterm
+           `%term' { identifier [`=' integer] }
+           `%termprefix' { identifier }
+           `%namespace' identifier
+            nonterm `:' tree [cost] [ `{' ccode `}' ] [costfunc]
+
+tree:      [identifier `:'] term `(' tree `,' tree `)'
+           [identifier `:'] term `(' tree `)'
+           [identifier `:'] term
+           [identifier `:'] nonterm
+
+cost:      `"' string '"'
+           integer
+
+costfunc: `cost' `{' ccode `}'
+.RE
+.fi
+.PP
+Where \fIccode\fP is arbitrary C code. \fIcost\fP and \fIcostfunc\fP are
+used mutually exclusive, you can't use both in one rule. \fIcost\fP must be a C
+expression, whereas \fIccode\fP inside \fIcostfunc\fP is the body of a C 
+function.
+.PP
+A simple pre-processor is included, consisting of: `%ifdef', `%else'
+and `%endif'.  `%ifdef' operates on definitions from the command
+line. Also, one can include files verbatim with the `%include'
+directive.
+
+.SH OPTIONS
+The following options are supported:
+.TP
+\fB\-c\fI value\fR, \fB\-\-cost\fR=\fIvalue\fR
+Set the default cost to `value'.
+.TP
+\fB\-d\fI file\fR, \fB\-\-header\-file\fR=\fIfile\fR
+Write a separate header file which contains all monoburg definitions.
+Could not be used without `--source-file'.
+.TP
+\fB\-D\fI sym\fR, \fB\-\-define\fR=\fIsym\fR
+Define the symbol `sym' as true.  This is used with %ifdef, %else
+and %endif in the source files to perform conditional parsing.
+.TP
+\fB\-e\fR, \fB\-\-dag\fR
+Extended mode. Enable monoburg to work with DAGs.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Display usage instructions.
+.TP
+\fB\-I\fI dir\fR, \fB\-\-include\-dir\fR=\fIdir\fR
+Add `path' to the list of directories `%include' will search into.
+.TP
+\fB\-n\fI def\fR, \fB\-\-header\-define\fR=\fIdef\fR
+Change the symbol `#define'd on the top of the produced header
+file. The default is `_MONO_BURG_DEFS_'.
+.TP
+\fB\-p\fR, \fB\-\-predefined\-terms\fR
+Assume terminals are already defined: it's possible to omit the `%term'
+definitions in this mode if you use the `%termprefix' command. All symbols
+starting with a prefix specified in `%termprefix' are considered to be terminals.
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Do not output warning messages.
+.TP
+\fB\-s\fI file\fR, \fB\-\-source\-file\fR=\fIfile\fR
+Set `file' to be the output source code file. Couldn't be used without `--header-file'.
+.TP
+\fB\-v\fR, \fB\-\-version\fR
+Output the version number and exit.
+.TP
+\fB\-l\fR, \fB\-\-with\-line\fR
+Output `#line's directives in the C code, in order to trace
+origin of the code blocks.
+.TP
+\fB\-\-without\-glib\fR
+Output a glib independent code.
+.TP
+\fB\-\-without\-exported-symbols\fR
+Avoid exported symbols as much as possible.
+.TP
+\fB\-\-with\-references\fR
+Emit functions take references and not pointer to trees.
+The symbol __WITH_REFERENCES is defined to true (see \fBEXAMPLE\fR).
+This option leads to C++-only code.
+
+.PP
+.SH EXAMPLE
+Example rules:
+.PP
+.nf
+.RS
+.ft CW
+# Define some terminal.
+%term Fetch Four Mul Plus
+# Put everything in a `monoburg::example' namespace
+# (leads to C++-only code).
+%namespace monoburg
+%namespace example
+# This rule uses fixed costs.
+addr: Plus (con, Mul (Four, reg)) 2 
+{
+        printf ("Emit your code here.");
+} 
+
+# This one computes costs inside a function.
+# Note that the `addr' subtree is named `name'.
+reg:  Fetch (name : addr)  
+{
+%ifdef __WITH_REFERENCES
+        printf ("Tree address is %p", &tree);
+%else
+        printf ("Tree address is %p", tree);
+%endif
+} cost {
+	int c;
+
+	c = 1; /* calculate the costs here */
+
+	return c;
+}
+.RE
+.fi
+
+.SH AUTHOR
+monoburg was written by Dietmar Maurer and extended, packaged and
+cleaned by Michael Cadilhac. It is based on the papers from
+Christopher W.\ Fraser, Robert R.\ Henry and Todd A.\ Proebsting:
+"BURG - Fast Optimal Instruction Selection and Tree Parsing" and
+"Engineering a Simple, Efficient Code Generator Generator".
+.SH SEE ALSO
+.BR monodis(1)
+.BR pedump(1)
