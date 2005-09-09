@@ -23,9 +23,7 @@
 
 # include "monoburg.h"
 
-# define MAX_FDS 10
 # define MAX_FILENAME_LEN 100
-# define MAX_NAMESPACES 10
 
 typedef struct _File File;
 struct _File {
@@ -35,13 +33,10 @@ struct _File {
 	FILE *fd;
 };
 
-extern File inputs[MAX_FDS];
+extern GList *inputs;
 
-extern char *namespaces[MAX_NAMESPACES];
-extern char **include_dirs;
-
-extern int n_namespace;
-extern int n_include_dir;
+extern GList *namespaces;
+extern GList *include_dirs;
 
 extern GHashTable *definedvars;
 

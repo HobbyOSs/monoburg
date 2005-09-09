@@ -25,27 +25,37 @@
 /** Output header file data. */
 void emit_header_file ()
 {
-	int i;
+	int n_namespace = 0;
+	GList *namespace = namespaces;
 
 	emit_includes ();
 	emit_header ();
-	for (i = 0; i < n_namespace; ++i)
-	  output ("namespace %s {\n", namespaces[i]);
+	while (namespace)
+	{
+	  output ("namespace %s {\n", (char *) namespace->data);
+	  namespace = namespace->next;
+	  ++n_namespace;
+	}
 	emit_term ();
 	emit_nonterm ();
 	emit_state ();
 	emit_prototypes ();
-	for (i = 0; i < n_namespace; ++i)
+	while (n_namespace--)
 	  output ("}\n");
 }
 
 /** Output C file data. */
 void emit_code_file ()
 {
-	int i;
+	int n_namespace = 0;
+	GList *namespace = namespaces;
 
-	for (i = 0; i < n_namespace; ++i)
-	  output ("namespace %s {\n", namespaces[i]);
+	for (namespace = namespaces; namespace; namespace = namespace->next) {
+	  output ("namespace %s {\n", (char *) namespace->data);
+	  g_free (namespace->data);
+	  ++n_namespace;
+	}
+	g_list_free (namespaces);
 	emit_vardefs ();
 	emit_cost_func ();
 	emit_emitter_func ();
@@ -55,6 +65,6 @@ void emit_code_file ()
 	emit_label_func ();
 
 	emit_kids ();
-	for (i = 0; i < n_namespace; ++i)
+	while (n_namespace--)
 	  output ("}\n");
 }

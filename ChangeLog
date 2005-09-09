@@ -1,5 +1,13 @@
 2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* src/parser.h: Use `GList' for namespaces and include related
+	features.
+	* src/emit_files.c,
+	* src/parser.y:,
+	* src/main.c: Update accordingly.
+
+2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* NOTICE: Correct information.
 	* src/rule.c,
 	* src/rule.h: Clean code.

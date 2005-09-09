@@ -33,13 +33,10 @@
 #include "parser.h"
 #include "emit.h"
 
-File inputs[MAX_FDS];
-GHashTable *definedvars;
-char *namespaces[MAX_NAMESPACES];
-char **include_dirs;
-
-int n_include_dir = 0;
-int n_namespace = 0;
+GList *inputs = NULL;
+GHashTable *definedvars= NULL;
+GList *namespaces = NULL;
+GList *include_dirs = NULL;
 
 %}
 
@@ -77,10 +74,7 @@ decls   : /* empty */
 	| TERMPREFIX plist decls
 	| NAMESPACE IDENT {
 			warn_cxx ("`%namespace' directive");
-			if (n_namespace == MAX_NAMESPACES)
-				yyerror ("maximum namespace depth reached.");
-			else
-				namespaces[n_namespace++] = g_strdup($2);
+			namespaces = g_list_append (namespaces, $2);
 		} decls
 	| rule_list optcost optcode optcfunc {
 			GList *tmp;
@@ -137,60 +131,72 @@ optvarname: /* empty */ { $$ = NULL; }
 
 %%
 
+#define LASTINPUT ((File *) g_list_last (inputs)->data)
+
+/* We assume that there's no line larger than 2048 chars. */
 static char input[2048];
 static char *next = input;
-static int n_input = 0;
 static int state = 0;
 
 
 char *
 fgets_inc(char *s, int size)
 {
-  int n_length, i;
+  int n_length;
   char filename[MAX_FILENAME_LEN];
   int b_found = FALSE;
   char path[MAX_FILENAME_LEN * 2];
+  File *new_include;
+  GList *include_dir = include_dirs;
 
   /* 9 == strlen("%include "); */
   assert (size > 9 + MAX_FILENAME_LEN);
 
-  if (fgets (s, size, inputs[n_input].fd) == NULL) {
-    if (n_input == 0)
+  if (fgets (s, size, LASTINPUT->fd) == NULL) {
+    if (inputs->next == NULL)
       return 0;
-    free (inputs[n_input].filename);
-    fclose (inputs[n_input--].fd);
+    free (LASTINPUT->filename);
+    fclose (LASTINPUT->fd);
+    inputs = g_list_delete_link (inputs, g_list_last (inputs));
     if (state != 1)
       output ("#line %d \"%s\"\n",
-	      inputs[n_input].yylineno + 1,
-	      inputs[n_input].filename);
+	      LASTINPUT->yylineno + 1,
+	      LASTINPUT->filename);
     return fgets_inc(s, size);
   }
 
-  inputs[n_input].yylineno++;
-  inputs[n_input].yylinepos = 1;
+  LASTINPUT->yylineno++;
+  LASTINPUT->yylinepos = 1;
 
   n_length = strlen(s);
   if (strncmp (s, "%include ", 9) == 0) {
-    if (n_input == MAX_FDS - 1)
-      yyerror ("maximum include depth exceeded");
     if (n_length - 9 > MAX_FILENAME_LEN)
       yyerror ("`%%include' is referring to a too long filename");
     if (s[n_length - 1] == '\n')
       s[n_length - 1] = 0;
     strcpy (filename, s + 9);
-    for (i = 0; (b_found == FALSE) && i < n_include_dir; ++i)
-    {
-      sprintf (path, "%s/%s", include_dirs[i], filename);
-      if ((inputs[n_input + 1].fd = fopen (path, "r")))
-	b_found = TRUE;
-    }
+    new_include = g_new (File, 1);
+    if (filename[0] == '/')
+      b_found = (new_include->fd = fopen (filename, "r")) != 0;
+    else
+      while ((b_found == FALSE) && include_dir)
+      {
+	sprintf (path, "%s/%s", (char *) include_dir->data, filename);
+	if ((new_include->fd = fopen (path, "r")))
+	  b_found = TRUE;
+	include_dir = include_dir->next;
+      }
     if (b_found == FALSE)
+    {
+      g_free (new_include);
       yyerror ("`%%include %s': %s",
 	       filename, strerror(errno));
+    }
     if (state != 1)
       output ("#line %d \"%s\"\n", 1, path);
-    inputs[++n_input].yylineno = 0;
-    inputs[n_input].filename = strdup (path);
+    new_include->yylineno = 0;
+    new_include->filename = strdup (path);
+    inputs = g_list_append (inputs, new_include);
     return fgets_inc(s, size);
   }
   return s;
@@ -203,8 +209,8 @@ yyerror (char *fmt, ...)
 
   va_start(ap, fmt);
   fprintf (stderr, "%s: line %d(%d): ",
-	   inputs[n_input].filename,
-	   inputs[n_input].yylineno, inputs[n_input].yylinepos);
+	   LASTINPUT->filename,
+	   LASTINPUT->yylineno, LASTINPUT->yylinepos);
   vfprintf (stderr, fmt, ap);
   fprintf(stderr, "\n");
 
@@ -350,8 +356,8 @@ nextchar ()
 void
 yyparsetail (void)
 {
-  output ("#line %d \"%s\"\n", inputs[n_input].yylineno,
-	  inputs[n_input].filename);
+  output ("#line %d \"%s\"\n", LASTINPUT->yylineno,
+	  LASTINPUT->filename);
   while (fgets_inc (input, sizeof (input)))
     output ("%s", input);
 }
@@ -366,7 +372,7 @@ yylex (void)
     if (!(c = nextchar ()))
       return 0;
 
-    inputs[n_input].yylinepos = next - input;
+    LASTINPUT->yylinepos = next - input;
 
     if (isspace (c))
       continue;
@@ -441,8 +447,8 @@ yylex (void)
       unsigned i = 0, d = 1;
       static char buf [100000];
 
-      i = sprintf (buf, "#line %d \"%s\"\n", inputs[n_input].yylineno,
-		   inputs[n_input].filename);
+      i = sprintf (buf, "#line %d \"%s\"\n", LASTINPUT->yylineno,
+		   LASTINPUT->filename);
       while (d && (c = nextchar ())) {
 	buf [i++] = c;
 	assert (i < sizeof (buf));

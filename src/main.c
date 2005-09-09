@@ -55,9 +55,7 @@ GOPTION_CALLBACK (add_to_defined_vars,
 		  return TRUE;);
 
 GOPTION_CALLBACK (add_to_include_dirs,
-		  if (n_include_dir % 10 == 0)
-			  include_dirs = g_renew (char *, include_dirs, n_include_dir + 10);
-		  include_dirs [n_include_dir++] = (char *) g_strdup (value);
+		  include_dirs = g_list_append (include_dirs, g_strdup (value));
 		  return TRUE);
 
 static void bad_use (const char *program_name, const char *use)
@@ -155,6 +153,7 @@ static void parse_options (int argc, char **argv)
 
 int main (int argc, char **argv)
 {
+	File input;
 	FILE *deffd = 0;
 	FILE *cfd = 0;
 	guint handler_id;
@@ -191,28 +190,31 @@ int main (int argc, char **argv)
 		outputfd = stdout;
 
 	/* Parse burg files. */
-	inputs[0].yylineno = 0;
 	if (infiles) {
 		GList *l = infiles;
+		inputs = g_list_append (inputs, &input);
 		while (l) {
 			char *infile = (char *)l->data;
-			if (!(inputs[0].fd = fopen (infile, "r"))) {
+			input.yylineno = 0;
+			if (!(input.fd = fopen (infile, "r"))) {
 				perror ("cant open input file");
 				exit (-1);
 			}
-			inputs[0].filename = infile;
+			input.filename = infile;
 
 			output ("#line %d \"%s\"\n", 1, infile);
 			yyparse ();
 
 			reset_parser ();
 
-			l->data = inputs[0].fd;
+			l->data = g_memdup (&input, sizeof (File));
 			l = l->next;
 		}
 	} else {
-		inputs[0].fd = stdin;
-		inputs[0].filename = "stdin";
+		input.fd = stdin;
+		input.filename = "stdin";
+		input.yylineno = 0;
+		inputs = g_list_append (inputs, &input);
 		yyparse ();
 	}
 
@@ -251,9 +253,10 @@ int main (int argc, char **argv)
 	if (infiles) {
 		GList *l = infiles;
 		while (l) {
-			inputs[0].fd = l->data;
+			input = *((File *) l->data);
 			yyparsetail ();
-			fclose (inputs[0].fd);
+			fclose (input.fd);
+			g_free (l->data);
 			l = l->next;
 		}
 	} else {
