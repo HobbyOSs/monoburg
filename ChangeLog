@@ -1,3 +1,8 @@
+2005-09-11  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
+	* configure.ac,
+	* NEWS: Bump to 1.0.3.
+
 2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
 	* configure.ac,
