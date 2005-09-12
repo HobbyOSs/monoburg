@@ -1,3 +1,8 @@
+2005-09-12  Roland Levillain  <roland@lrde.epita.fr>
+
+	* configure.ac: Bump to 1.0.3a.
+	Check for Glib >= 2.6 (needed for GOptions).
+
 2005-09-11  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
 	* configure.ac,

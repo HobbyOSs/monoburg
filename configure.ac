@@ -14,7 +14,7 @@
 
 ## -------------------------------------
 ## Project
-AC_INIT([MonoBURG], [1.0.3])
+AC_INIT([MonoBURG], [1.0.3a])
 AM_CONFIG_HEADER([config.h])
 
 ## -------------------------------------
@@ -42,8 +42,9 @@ AC_PROG_YACC
 ## -------------------------------------
 ## Environment
 
-# Check for GLIB-2.0 presence
-AM_PATH_GLIB_2_0
+# Check for GLib 2.6 presence.
+PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.6, ,
+                  AC_MSG_ERROR([Glib 2.6 or newer is required]))
 
 ## -------------------------------------
 ## Epilogue
