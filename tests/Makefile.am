@@ -19,16 +19,19 @@
 
 TESTS = sample.test
 
-%.c: %.brg
-	cd $(top_builddir)/src && $(MAKE) $(AM_MAKEFLAGS) monoburg
+$(top_builddir)/src/monoburg$(EXEEXT):
+	cd $(top_builddir)/src && $(MAKE) $(AM_MAKEFLAGS) monoburg$(EXEEXT)
+
+## Uses GNU Make features.
+%.c: %.brg $(top_builddir)/src/monoburg$(EXEEXT)
 	$(top_builddir)/src/monoburg$(EXEEXT) $< > $@
 
 %.test: %.c
-	@if ! cmp $< $(srcdir)/$<.ref; then		\
-		echo 'rm $$0; exit 1' > $@;		\
-	else						\
-		echo 'rm $$0; exit 0' > $@;		\
-	fi;						\
+	if ! cmp $< $(srcdir)/$<.ref; then	\
+		echo 'rm $$0; exit 1' > $@;	\
+	else					\
+		echo 'rm $$0; exit 0' > $@;	\
+	fi
 	chmod a+x $@
 
 EXTRA_DIST = $(TESTS:.test=.brg) $(TESTS:.test=.c.ref)

@@ -1,3 +1,8 @@
+2005-09-13  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
+	* tests/Makefile.am: Add  monoburg$(EXEEXT) to the dependencies of
+	.c files generated from .brg.
+
 2005-09-12  Roland Levillain  <roland@lrde.epita.fr>
 
 	* configure.ac: Bump to 1.0.3a.
