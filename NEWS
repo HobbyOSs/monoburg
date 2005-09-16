@@ -1,3 +1,13 @@
+* 1.0.4
+
+** Support named subtree with multi rules
+
+  One can now do:
+	num: Plus (Name1 : num, Name2 : num),
+	num: Moins (Name3 : num, Name4 : num)
+  Moreover, Name3 could be renamed Name1. The only restriction
+  is that Name4 couldn't be named Name1 nor Name3.
+
 * 1.0.3
 
 ** Add --with-line option

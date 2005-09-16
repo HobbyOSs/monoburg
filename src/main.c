@@ -18,8 +18,6 @@
  ** \brief Main function. Option parsing, and so on.
  */
 
-#include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <glib/goption.h>
 #include "monoburg.h"
@@ -53,11 +51,11 @@ gboolean predefined_terms = 0;
 GOPTION_CALLBACK (add_to_defined_vars,
 		  g_hash_table_insert (definedvars, g_strdup (value),
 				       GUINT_TO_POINTER (1));
-		  return TRUE;);
+		  return TRUE;)
 
 GOPTION_CALLBACK (add_to_include_dirs,
 		  include_dirs = g_list_append (include_dirs, g_strdup (value));
-		  return TRUE);
+		  return TRUE;)
 
 static void bad_use (const char *program_name, const char *use)
 {

@@ -19,14 +19,11 @@
  ** \brief Burg files' grammar description.
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <ctype.h>
 #include <assert.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <ctype.h>
+#include <string.h>
 
 #include "monoburg.h"
 #include "rule.h"
@@ -79,7 +76,7 @@ decls   : /* empty */
 	| rule_list optcost optcode optcfunc {
 			GList *tmp;
 			for (tmp = $1; tmp; tmp = tmp->next) {
-				rule_add (tmp->data, $3, $2, $4);
+				rule_add (tmp->data, &($3), $2, $4);
 			}
 			g_list_free ($1);
 		} decls
@@ -195,7 +192,7 @@ fgets_inc(char *s, int size)
     if (state != 1 && with_line)
       output ("#line %d \"%s\"\n", 1, path);
     new_include->yylineno = 0;
-    new_include->filename = strdup (path);
+    new_include->filename = g_strdup (path);
     inputs = g_list_append (inputs, new_include);
     return fgets_inc(s, size);
   }
@@ -220,7 +217,7 @@ yyerror (char *fmt, ...)
 }
 
 void
-reset_parser ()
+reset_parser (void)
 {
   state = 0;
 }
@@ -263,7 +260,7 @@ push_if (char *input, gboolean flip)
 }
 
 static void
-flip_if ()
+flip_if (void)
 {
   if (!pp)
       yyerror ("%%else without %%if");
@@ -272,7 +269,7 @@ flip_if ()
 }
 
 static void
-pop_if ()
+pop_if (void)
 {
   struct pplist *prev_pp = pp;
 
@@ -284,7 +281,7 @@ pop_if ()
 }
 
 static char
-nextchar ()
+nextchar (void)
 {
   int next_state ;
   gboolean ll;
@@ -445,12 +442,13 @@ yylex (void)
     }
 
     if (c == '{') {
-      unsigned i = 0, d = 1;
+      unsigned i = 3, d = 1;
       static char buf [100000];
 
+      g_memmove (buf, "\t{\n", 4);
       if (with_line)
-	i = sprintf (buf, "#line %d \"%s\"\n", LASTINPUT->yylineno,
-		     LASTINPUT->filename);
+	i += sprintf (buf + 3, "#line %d \"%s\"\n", LASTINPUT->yylineno,
+		      LASTINPUT->filename);
       while (d && (c = nextchar ())) {
 	buf [i++] = c;
 	assert (i < sizeof (buf));
@@ -462,7 +460,7 @@ yylex (void)
 		break;
 	}
       }
-      buf [--i] = '\0';
+      g_memmove (buf + --i, "\n\t}", 4);
       yylval.text = g_strdup (buf);
 
       return CODE;

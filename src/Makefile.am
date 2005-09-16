@@ -24,6 +24,8 @@ monoburg_SOURCES =			\
 	emit_functions.c emit_kids.c	\
 	emit_pretty_print.c main.c	\
 	monoburg.h parser.h		\
-	rule.c rule.h
+	rule.c rule.h			\
+	mem_clean.c mem_clean.h		\
+	named_subtree.c named_subtree.h
 
 monoburg_LDADD = $(GLIB_LIBS)

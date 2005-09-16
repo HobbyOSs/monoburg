@@ -155,10 +155,12 @@ mono_burg_emit_3 (MBTREE_TYPE *tree, MBCGEN_TYPE *s)
 {
 	(void) tree; (void) s;
 	{
+	{
 
 	int ern = mono_burg_rule (tree->state, MB_NTERM_addr);
 	printf ("%s\n", mono_burg_rule_string [ern]);
 
+	}
 	}
 }
 
@@ -170,10 +172,12 @@ mono_burg_emit_5 (MBTREE_TYPE *tree, MBCGEN_TYPE *s)
 {
 	(void) tree; (void) s;
 	{
+	{
 
 	int ern = mono_burg_rule (tree->state, MB_NTERM_reg);
 	printf ("%s\n", mono_burg_rule_string [ern]);
 
+	}
 	}
 }
 

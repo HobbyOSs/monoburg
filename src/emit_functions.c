@@ -21,9 +21,6 @@
 #include "monoburg.h"
 #include "emit.h"
 
-static void emit_tree_variables (char *prefix, int depth, Tree *t);
-static void emit_rule_variables (Rule *rule);
-
 /** Emit rule functions. */
 void emit_emitter_func ()
 {
@@ -47,7 +44,7 @@ void emit_emitter_func ()
 
 			if (dag_mode)
 				output ("mono_burg_emit_%d (MBState *state, MBTREE_TYPE %ctree, MBCGEN_TYPE *s)\n", i,
-					  (with_references ? '&' : '*'));
+					(with_references ? '&' : '*'));
 			else
 				output ("mono_burg_emit_%d (MBTREE_TYPE %ctree, MBCGEN_TYPE *s)\n", i,
 					(with_references ? '&' : '*'));
@@ -56,9 +53,7 @@ void emit_emitter_func ()
 			output ("\t(void) tree; (void) s;");
 			if (dag_mode)
 				output (" (void) state;");
-			output ("\n\t{\n");
-			emit_rule_variables (rule);
-			output ("%s\n\t}\n", rule->code);
+			output ("\n\t{\n%s\n\t}\n", rule->code);
 			output ("}\n\n");
 			g_hash_table_insert (cache, rule->code, GINT_TO_POINTER (i + 1));
 		}
@@ -80,48 +75,4 @@ void emit_emitter_func ()
 		i++;
 	}
 	output ("};\n\n");
-}
-
-/** Emit named rule parts of a rule. */
-static void emit_rule_variables (Rule *rule)
-{
-	Tree *t = rule->tree;
-
-	if (t) {
-		emit_tree_variables ("", 0, t);
-	}
-
-}
-
-/** Emit named rule parts of a rule tree. */
-static void emit_tree_variables (char *prefix, int depth, Tree *t)
-{
-	char *tn;
-	int i;
-
-	if (t->varname) {
-		if (with_references) {
-			output ("MBTREE_TYPE &%s = *(%s(&tree))",
-				t->varname, prefix);
-		} else {
-			output ("MBTREE_TYPE *%s = (%s(tree))",
-				t->varname, prefix);
-		}
-
-		for (i = 0; i < depth; ++i)
-			output (")");
-		output (";\n");
-	}
-
-	if (t->left) {
-		tn = g_strconcat ("MBTREE_LEFT(", prefix, NULL);
-		emit_tree_variables (tn, depth + 1, t->left);
-		g_free (tn);
-	}
-
-	if (t->right) {
-		tn = g_strconcat ("MBTREE_RIGHT(", prefix, NULL);
-		emit_tree_variables (tn, depth + 1, t->right);
-		g_free (tn);
-	}
 }

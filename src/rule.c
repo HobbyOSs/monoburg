@@ -21,6 +21,7 @@
 #include <string.h>
 #include "monoburg.h"
 #include "parser.h"
+#include "named_subtree.h"
 #include "rule.h"
 
 GList *term_list = NULL;
@@ -33,22 +34,41 @@ int default_cost = 0;
 
 static NonTerm *nonterm (char *id);
 
-
 Rule *make_rule (char *id, Tree *tree)
 {
 	Rule *rule = g_new0 (Rule, 1);
 	rule->lhs = nonterm (id);
 	rule->tree = tree;
+	rule->vartree = NULL;
+	rule->code = NULL;
 
 	return rule;
 }
 
-void rule_add (Rule *rule, char *code, char *cost, char *cfunc)
+void rule_add (Rule *rule, char **p_code, char *cost, char *cfunc)
 {
 	rule_list = g_list_append (rule_list, rule);
 
 	rule->cfunc = cfunc;
-	rule->code = code;
+
+	if (rule->vartree) {
+		char *varstr;
+
+		varstr = compute_vartree_decs (rule->vartree);
+		if (*varstr) {
+			char *varstr_void_use = compute_vartree_void_use (rule->vartree);
+
+			rule->code = g_strconcat (varstr, varstr_void_use, *p_code, NULL);
+			g_free (*p_code);
+			g_free (varstr);
+			g_free (varstr_void_use);
+			*p_code = rule->code;
+		} else {
+			g_free (varstr);
+			rule->code = *p_code;
+		}
+	} else
+		rule->code = *p_code;
 
 	if (cfunc) {
 		if (cost)
@@ -72,42 +92,19 @@ void rule_add (Rule *rule, char *code, char *cost, char *cfunc)
 		rule->tree->nonterm->chain = g_list_append (rule->tree->nonterm->chain, rule);
 }
 
-static void check_varname (char *varname, Tree *t)
-{
-	if (t->varname && !strcmp (varname, t->varname))
-		yyerror ("variable name `%s' redefined", varname);
-	if (t->left)
-		check_varname (varname, t->left);
-	if (t->right)
-		check_varname (varname, t->right);
-}
-
-static void check_varnames (Tree *t_source, Tree *t_on)
-{
-	if (t_source->varname)
-		check_varname (t_source->varname, t_on);
-	if (t_source->left)
-		check_varnames (t_source->left, t_on);
-	if (t_source->right)
-		check_varnames (t_source->right, t_on);
-}
-
-static void check_has_varname (Tree *t)
-{
-	if (t->varname)
-		yyerror ("can't use named rules with multiple rules");
-	if (t->left)
-		check_has_varname (t->left);
-	if (t->right)
-		check_has_varname (t->right);
-}
-
 GList *rule_list_prepend (GList *list, Rule *rule)
 {
-	if (list && !list->next)
-		check_has_varname (((Rule *) list->data)->tree);
 	if (list)
-		check_has_varname (rule->tree);
+	{
+		Rule *first_rule = (Rule *) list->data;
+
+		fill_vartree (&(first_rule->vartree), rule->tree);
+		rule->vartree = first_rule->vartree;
+		first_rule->vartree = NULL;
+	}
+	else
+		fill_vartree (&rule->vartree, rule->tree);
+
 	return g_list_prepend (list, rule);
 }
 
@@ -118,7 +115,8 @@ Tree *create_tree (char *id, char *varname, Tree *left, Tree *right)
 	Tree *tree = g_new0 (Tree, 1);
 
 	if (term_hash)
-		term = g_hash_table_lookup (term_hash, id);
+		if ((term = g_hash_table_lookup (term_hash, id)))
+			g_free (id);
 
 	/* try if id has termprefix */
 	if (!term) {
@@ -130,7 +128,6 @@ Tree *create_tree (char *id, char *varname, Tree *left, Tree *right)
 				break;
 			}
 		}
-
 	}
 
 	if (term) {
@@ -144,23 +141,15 @@ Tree *create_tree (char *id, char *varname, Tree *left, Tree *right)
 		tree->op = term;
 		tree->left = left;
 		tree->right = right;
-		g_free (id);
 	} else {
 		tree->nonterm = nonterm (id);
 	}
 
 	if (varname) {
-		if (tree->left)
-			check_varname (varname, tree->left);
-		if (tree->right)
-			check_varname (varname, tree->right);
 		tree->varname = varname;
 	} else {
 		tree->varname = NULL;
 	}
-
-	if (tree->left && tree->right)
-		check_varnames (tree->left, tree->right);
 
 	return tree;
 }
@@ -240,90 +229,4 @@ void start_nonterm (char *id)
 
 	start_def = TRUE;
 	nonterm (id);
-}
-
-void free_tree (Tree *tree)
-{
-	if (!tree)
-		return;
-	g_free (tree->varname);
-	free_tree (tree->left);
-	free_tree (tree->right);
-	g_free (tree);
-}
-
-static void free_prefix ()
-{
-	GList *prefix;
-	for (prefix = prefix_list; prefix; prefix = prefix->next) {
-		g_free (prefix->data);
-	}
-	g_list_free (prefix);
-}
-
-static void free_rules_prevent_refree (Rule *rule, GList *rule_list)
-{
-	char *cost = rule->cost;
-	char *cfunc = rule->cfunc;
-	char *code = rule->code;
-	Tree *tree = rule->tree;
-
-	for (; rule_list; rule_list = rule_list->next) {
-		rule = (Rule *) rule_list->data;
-		if (cost == rule->cost)
-			rule->cost = NULL;
-		if (cfunc == rule->cfunc)
-			rule->cfunc = NULL;
-		if (code == rule->code)
-			rule->code = NULL;
-		if (tree == rule->tree)
-			rule->tree = NULL;
-	}
-}
-
-void free_rules ()
-{
-	GList *rule;
-	Rule *p_rule;
-	for (rule = rule_list; rule; rule = rule->next ) {
-		p_rule = (Rule *) rule->data;
-		free_rules_prevent_refree (p_rule, rule->next);
-		g_free (p_rule->cost);
-		g_free (p_rule->cfunc);
-		g_free (p_rule->code);
-		free_tree (p_rule->tree);
-		g_free (p_rule);
-	}
-	g_list_free (rule_list);
-
-	free_prefix ();
-}
-
-void free_terms ()
-{
-	GList *term;
-	Term *p_term;
-	for (term = term_list; term; term = term->next) {
-		p_term = (Term *) term->data;
-		g_free (p_term->name);
-		g_list_free (p_term->rules);
-		g_free (p_term);
-	}
-	g_list_free (term_list);
-	g_hash_table_destroy (term_hash);
-}
-
-void free_nonterms ()
-{
-	GList *nonterm = nonterm_list;
-	NonTerm *p_nonterm;
-	for (nonterm = nonterm_list; nonterm; nonterm = nonterm->next) {
-		p_nonterm = (NonTerm *) nonterm->data;
-		g_free (p_nonterm->name);
-		g_list_free (p_nonterm->chain);
-		g_list_free (p_nonterm->rules);
-		g_free (p_nonterm);
-	}
-	g_list_free (nonterm_list);
-	g_hash_table_destroy (nonterm_hash);
 }

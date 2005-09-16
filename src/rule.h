@@ -49,10 +49,18 @@ struct _Tree {
 	NonTerm *nonterm; /* used by chain rules */
 };
 
+typedef struct _VarTree VarTree;
+struct _VarTree {
+	VarTree *left;
+	VarTree *right;
+	GList *varnames;
+};
+
 typedef struct _Rule Rule;
 struct _Rule {
 	NonTerm *lhs;
 	Tree *tree;
+	VarTree *vartree;
 	char *code;
 	char *cost;
 	char *cfunc;
@@ -73,10 +81,6 @@ void     create_term_prefix (char *id);
 GList	*rule_list_prepend (GList *list, Rule *rule);
 void     start_nonterm  (char *id);
 Rule    *make_rule      (char *id, Tree *tree);
-void     rule_add       (Rule *rule, char *code, char *cost, char *cfunc);
-
-void	 free_rules ();
-void	 free_terms ();
-void	 free_nonterms ();
+void     rule_add       (Rule *rule, char **code, char *cost, char *cfunc);
 
 #endif /* __MONO_RULE_H__ */

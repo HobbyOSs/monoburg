@@ -20,6 +20,7 @@
 
 #include "monoburg.h"
 #include "parser.h"
+#include "mem_clean.h"
 #include "emit.h"
 
 /** Output header file data. */

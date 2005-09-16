@@ -14,7 +14,7 @@
 
 ## -------------------------------------
 ## Project
-AC_INIT([MonoBURG], [1.0.3a])
+AC_INIT([MonoBURG], [1.0.4])
 AM_CONFIG_HEADER([config.h])
 
 ## -------------------------------------

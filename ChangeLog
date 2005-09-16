@@ -1,5 +1,33 @@
 2005-09-16  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* src/named_subtree.h,
+	* src/named_subtree.c: New. Named subtree related functions.
+	Allow use in multi-rules.
+	
+	* src/rule.c,
+	* src/rule.h: Move named subtree related functions to
+	`src/named_subtree.[ch]'.
+	Move memory cleaning related functions to `src/mem_clean.[ch]'
+	
+	* src/mem_clean.c,
+	* src/mem_clean.h: New. Memory cleaning related functions.
+	
+	* src/emit_files.c: Use `mem_clean.h'.
+	
+	* src/parser.y,
+	* src/emit_functions.c,
+	* src/emit_cost.c: Allow named subtree in multi-rules.
+	
+	* src/main.c: Fix to (close to) compile with -pedantic.
+	
+	* src/Makefile.am: Add new files.
+	* tests/sample.c.ref: Regen.
+	
+	* configure.ac,
+	* NEWS: Bump to 1.0.4.
+
+2005-09-16  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* tests/Makefile.am: Use diff(1) instead of cmp(1) if VERBOSE is set.
 	Copy the failing C file to `file.c.fail'.
 
