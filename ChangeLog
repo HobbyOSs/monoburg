@@ -1,3 +1,8 @@
+2005-09-16  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
+	* src/emit_functions.c (emit_emitter_func): Fix small bug on #define
+	optimization.
+
 2005-09-13  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
 	* tests/Makefile.am: Add  monoburg$(EXEEXT) to the dependencies of

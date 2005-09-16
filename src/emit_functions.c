@@ -37,7 +37,7 @@ void emit_emitter_func ()
 		if (rule->code) {
 			if ((rulen = GPOINTER_TO_INT (g_hash_table_lookup (cache, rule->code)))) {
 				emit_rule_string (rule, "");
-				output ("#define mono_burg_emit_%d mono_burg_emit_%d\n\n", i, rulen);
+				output ("#define mono_burg_emit_%d mono_burg_emit_%d\n\n", i, rulen - 1);
 				i++;
 				continue;
 			}
@@ -60,7 +60,7 @@ void emit_emitter_func ()
 			emit_rule_variables (rule);
 			output ("%s\n\t}\n", rule->code);
 			output ("}\n\n");
-			g_hash_table_insert (cache, rule->code, GINT_TO_POINTER (i));
+			g_hash_table_insert (cache, rule->code, GINT_TO_POINTER (i + 1));
 		}
 		i++;
 	}
