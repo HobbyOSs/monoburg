@@ -1,5 +1,11 @@
 2005-09-16  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
+	* tests/Makefile.am: Use diff(1) instead of cmp(1) if VERBOSE is set.
+	Copy the failing C file to `file.c.fail'.
+
+
+2005-09-16  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
+
 	* src/emit_functions.c (emit_emitter_func): Fix small bug on #define
 	optimization.
 

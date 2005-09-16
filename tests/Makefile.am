@@ -27,12 +27,15 @@ $(top_builddir)/src/monoburg$(EXEEXT):
 	$(top_builddir)/src/monoburg$(EXEEXT) $< > $@
 
 %.test: %.c
-	if ! cmp $< $(srcdir)/$<.ref; then	\
-		echo 'rm $$0; exit 1' > $@;	\
-	else					\
-		echo 'rm $$0; exit 0' > $@;	\
+	diff_tool=diff;					\
+	test x$(VERBOSE) = x && diff_tool=cmp;		\
+	if ! $$diff_tool $< $(srcdir)/$<.ref; then	\
+		cp -f $< $<.fail;			\
+		echo 'rm $$0; exit 1' > $@;		\
+	else						\
+		echo 'rm $$0; exit 0' > $@;		\
 	fi
 	chmod a+x $@
 
 EXTRA_DIST = $(TESTS:.test=.brg) $(TESTS:.test=.c.ref)
-CLEANFILES = $(TESTS:.test=.c)
+CLEANFILES = $(TESTS:.test=.c) $(TESTS:.test=.c.fail)
