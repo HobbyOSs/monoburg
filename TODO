@@ -1,13 +1,5 @@
 				MonoBURG
 				********
-General
-=======
-
-* Make monoburg output C++ friendly.
-
-* Fix monoburg scanner (do not use fixed-length strings, etc.).
-
-* Enhance error detection in input.
 
 Suggestions
 ===========
