@@ -1,3 +1,11 @@
+* 1.0.4a
+
+** Support `with-references' option as a %-directive
+
+  Monoburg generates C++ references instead of pointers when using
+  `--with-references', or upon a `%with-references' directive in the
+  input file.
+
 * 1.0.4
 
 ** Support named subtree with multi rules
