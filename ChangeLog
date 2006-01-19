@@ -1,3 +1,11 @@
+2006-01-19  Roland Levillain  <roland@lrde.epita.fr>
+
+	Support Vcs.
+
+	* configure.ac: Bump to 1.0.4a.
+	* vcs/monoburg.rb: New.
+	* COPYING, INSTALL: New.
+
 2005-10-07  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
 	* TODO: Modify to reflect current project status.
