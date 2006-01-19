@@ -1,5 +1,10 @@
 2006-01-19  Roland Levillain  <roland@lrde.epita.fr>
 
+	* src/parser.y: Handle `with-references' option as a MonoBURG
+	\%-directive.
+
+2006-01-19  Roland Levillain  <roland@lrde.epita.fr>
+
 	Support Vcs.
 
 	* configure.ac: Bump to 1.0.4a.

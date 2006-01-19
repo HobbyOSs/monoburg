@@ -21,6 +21,7 @@
 
 #include <assert.h>
 #include <stdarg.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <ctype.h>
 #include <string.h>
@@ -53,6 +54,7 @@ GList *include_dirs = NULL;
 %token  TERM
 %token  TERMPREFIX
 %token  NAMESPACE
+%token  WITH_REFERENCES
 %token <ivalue> INTEGER
 
 %type   <tree>          tree
@@ -72,6 +74,12 @@ decls   : /* empty */
 	| NAMESPACE IDENT {
 			warn_cxx ("`%namespace' directive");
 			namespaces = g_list_append (namespaces, $2);
+		} decls
+	| WITH_REFERENCES {
+			warn_cxx ("`%with-references' directive");
+			g_hash_table_insert (definedvars,
+					     g_strdup ("__WITH_REFERENCES"),
+					     GUINT_TO_POINTER (1));
 		} decls
 	| rule_list optcost optcode optcfunc {
 			GList *tmp;
@@ -394,6 +402,11 @@ yylex (void)
       if (!strncmp (next, "namespace", 9) && isspace (next[9])) {
 	next += 9;
 	return NAMESPACE;
+      }
+
+      if (!strncmp (next, "with-references", 15) && isspace (next[15])) {
+	next += 15;
+	return WITH_REFERENCES;
       }
 
       return c;
