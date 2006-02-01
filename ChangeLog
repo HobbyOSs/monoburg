@@ -1,5 +1,10 @@
 2006-02-01  Roland Levillain  <roland@lrde.epita.fr>
 
+	* configure.ac: Bump to 1.0.5a.
+	* TODO: More
+
+2006-02-01  Roland Levillain  <roland@lrde.epita.fr>
+
 	Version 1.0.5.
 	Rework MonoBURG options.
 

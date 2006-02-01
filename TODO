@@ -5,8 +5,50 @@ Suggestions
 ===========
 
 * Suggested by Akim Demaille:
-  The macros emited to compensate glib might be grouped in a single string, 
+  The macros emitted to compensate glib might be grouped in a single string, 
   defined in an external file `/usr/share/monoburg/monoburg-header.h', then 
   output by a single call to output().
 
   This is nicer but it needs an external file to be installed.
+
+* Move options as %-directives in the prelude of the grammar.
+
+  I.e., things like %no-line, %cxx-ref, etc. should appear before the
+  first %%, as in Bison.
+
+* Reserve %include for brg files?
+
+  Instead of allowing an %include directive in the prelude, we might
+  provide verbatim sections with %{ and %}, à la Yacc.  Thus,
+
+    %include foo.h
+    %%
+    # ...
+
+  would be written
+
+    %{
+    #include "foo.h"
+    %}
+    %%
+    # ...
+
+  I (Roland) am not completely sure about this, so comments are
+  welcome.
+
+* Provide header-define option as a %-directive
+
+* Revamp the scanner.
+
+  It is a real mess.  Either use a Lex-generated scanner (but it adds a
+  dependency on another tool, which Mono developers might not want); or
+  rewrite it.
+
+
+
+Local Variables:
+mode: outline
+ispell-local-dictionary: "american"
+End:
+
+LocalWords:  MonoBURG Lex
