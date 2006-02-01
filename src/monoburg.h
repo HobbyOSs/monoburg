@@ -25,10 +25,10 @@
 # include <config.h>
 # include <glib.h>
 
-extern gboolean with_line;
-extern gboolean with_glib;
-extern gboolean with_exported_symbols;
-extern gboolean with_references;
+extern gboolean lines_p;
+extern gboolean glib_p;
+extern gboolean exported_symbols_p;
+extern gboolean cxx_ref_p;
 extern int predefined_terms;
 extern int dag_mode;
 

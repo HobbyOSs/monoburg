@@ -1,3 +1,36 @@
+2006-02-01  Roland Levillain  <roland@lrde.epita.fr>
+
+	Version 1.0.5.
+	Rework MonoBURG options.
+
+	* configure.ac: Version 1.0.5.
+	* NEWS: Update.
+	* src/main.c (main): Set default include directory to "" instead
+	of ".".
+	Disable uncontrolled emission of `#line' directives.
+	* src/parser.y (fgets_inc): Likewise.
+	(WITH_REFERENCES): Rename token as...
+	(CXX_REF): ...this.
+	(NO_LINES, NO_GLIB, NO_EXPORTED_SYMBOLS): New tokens.
+	(yylex): Generate these tokens.
+	(decls): Use them in this production to recognize new
+	\%-directives.
+	(fgets_inc): Don't print empty include dirs.
+	* tests/sample.brg: Use \%no-lines.
+
+	* src/main.c (with_line, with_glib, with_exported_symbols)
+	(with_references): Rename as...
+	(lines_p, glib_p, exported_symbols_p, cxx_ref_p): ...these.
+	(parse_options): Adjust.
+	* src/monoburg.h,
+	* src/emit.c (emit_includes, emit_header, emit_label_func) 
+	(emit_vardefs, emit_vardefs, emit_prototypes)
+	* src/emit_cost.c (emit_cost_func)
+	* src/emit_kids.c (emit_kids)
+	* src/emit_functions.c (emit_emitter_func)
+	* src/named_subtree.c (compute_vartree_decs_)
+	* src/parser.y (fgets_inc, yyparsetail, yylex): Adjust.
+
 2006-01-19  Roland Levillain  <roland@lrde.epita.fr>
 
 	* NEWS: Update.

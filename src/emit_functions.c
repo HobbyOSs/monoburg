@@ -44,10 +44,10 @@ void emit_emitter_func ()
 
 			if (dag_mode)
 				output ("mono_burg_emit_%d (MBState *state, MBTREE_TYPE %ctree, MBCGEN_TYPE *s)\n", i,
-					(with_references ? '&' : '*'));
+					(cxx_ref_p ? '&' : '*'));
 			else
 				output ("mono_burg_emit_%d (MBTREE_TYPE %ctree, MBCGEN_TYPE *s)\n", i,
-					(with_references ? '&' : '*'));
+					(cxx_ref_p ? '&' : '*'));
 
 			output ("{\n");
 			output ("\t(void) tree; (void) s;");
@@ -62,7 +62,7 @@ void emit_emitter_func ()
 
 	g_hash_table_destroy (cache);
 
-	if (!with_exported_symbols)
+	if (!exported_symbols_p)
 		output ("static ");
 	output ("MBEmitFunc const mono_burg_func [] = {\n");
 	output ("\tNULL,\n");

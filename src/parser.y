@@ -4,7 +4,7 @@
  **
  ** MonoBURG, an iburg like code generator generator.
  **
- ** Copyright (C) 2001, 2002, 2004, 2005 Ximian, Inc.
+ ** Copyright (C) 2001, 2002, 2004, 2005, 2006 Ximian, Inc.
  **
  ** This program is free software; you can redistribute it and/or
  ** modify it under the terms of the GNU General Public License
@@ -54,7 +54,10 @@ GList *include_dirs = NULL;
 %token  TERM
 %token  TERMPREFIX
 %token  NAMESPACE
-%token  WITH_REFERENCES
+%token  NO_LINES
+%token  NO_GLIB
+%token  NO_EXPORTED_SYMBOLS
+%token  CXX_REF
 %token <ivalue> INTEGER
 
 %type   <tree>          tree
@@ -75,10 +78,14 @@ decls   : /* empty */
 			warn_cxx ("`%namespace' directive");
 			namespaces = g_list_append (namespaces, $2);
 		} decls
-	| WITH_REFERENCES {
-			warn_cxx ("`%with-references' directive");
+	| NO_LINES { lines_p = FALSE; } decls
+	| NO_GLIB { glib_p = FALSE; } decls
+	| NO_EXPORTED_SYMBOLS { exported_symbols_p = FALSE; } decls
+	| CXX_REF {
+			warn_cxx ("`%cxx-ref' directive");
+			cxx_ref_p = TRUE;
 			g_hash_table_insert (definedvars,
-					     g_strdup ("__WITH_REFERENCES"),
+					     g_strdup ("__CXX_REF"),
 					     GUINT_TO_POINTER (1));
 		} decls
 	| rule_list optcost optcode optcfunc {
@@ -163,10 +170,15 @@ fgets_inc(char *s, int size)
     free (LASTINPUT->filename);
     fclose (LASTINPUT->fd);
     inputs = g_list_delete_link (inputs, g_list_last (inputs));
-    if (state != 1 && with_line)
+/* FIXME: At this stage, we can emit a #line even if the %no-lines directive
+   might be read later in the grammar.  So, this part has been disabled until
+   the scanner/parser is revamped to handle this case.  */
+#if 0
+    if (state != 1 && lines_p)
       output ("#line %d \"%s\"\n",
 	      LASTINPUT->yylineno + 1,
 	      LASTINPUT->filename);
+#endif
     return fgets_inc(s, size);
   }
 
@@ -186,7 +198,10 @@ fgets_inc(char *s, int size)
     else
       while ((b_found == FALSE) && include_dir)
       {
-	sprintf (path, "%s/%s", (char *) include_dir->data, filename);
+	if (strcmp ((char *) include_dir->data, "") == 0)
+	  sprintf (path, "%s", filename);
+	else
+	  sprintf (path, "%s/%s", (char *) include_dir->data, filename);
 	if ((new_include->fd = fopen (path, "r")))
 	  b_found = TRUE;
 	include_dir = include_dir->next;
@@ -197,7 +212,7 @@ fgets_inc(char *s, int size)
       yyerror ("`%%include %s': %s",
 	       filename, strerror(errno));
     }
-    if (state != 1 && with_line)
+    if (state != 1 && lines_p)
       output ("#line %d \"%s\"\n", 1, path);
     new_include->yylineno = 0;
     new_include->filename = g_strdup (path);
@@ -361,7 +376,7 @@ nextchar (void)
 void
 yyparsetail (void)
 {
-  if (with_line)
+  if (lines_p)
     output ("#line %d \"%s\"\n", LASTINPUT->yylineno,
 	    LASTINPUT->filename);
   while (fgets_inc (input, sizeof (input)))
@@ -384,6 +399,7 @@ yylex (void)
       continue;
 
     if (c == '%') {
+      /* FIXME: Don't hard-code token lengths. */
       if (!strncmp (next, "start", 5) && isspace (next[5])) {
 	next += 5;
 	return START;
@@ -404,9 +420,24 @@ yylex (void)
 	return NAMESPACE;
       }
 
-      if (!strncmp (next, "with-references", 15) && isspace (next[15])) {
-	next += 15;
-	return WITH_REFERENCES;
+      if (!strncmp (next, "no-lines", 8) && isspace (next[8])) {
+	next += 8;
+	return NO_LINES;
+      }
+
+      if (!strncmp (next, "no-glib", 7) && isspace (next[7])) {
+	next += 7;
+	return NO_GLIB;
+      }
+
+      if (!strncmp (next, "no-exported-symbols", 19) && isspace (next[19])) {
+	next += 19;
+	return NO_EXPORTED_SYMBOLS;
+      }
+
+      if (!strncmp (next, "cxx-ref", 7) && isspace (next[7])) {
+	next += 7;
+	return CXX_REF;
       }
 
       return c;
@@ -459,7 +490,7 @@ yylex (void)
       static char buf [100000];
 
       g_memmove (buf, "\t{\n", 4);
-      if (with_line)
+      if (lines_p)
 	i += sprintf (buf + 3, "#line %d \"%s\"\n", LASTINPUT->yylineno,
 		      LASTINPUT->filename);
       while (d && (c = nextchar ())) {

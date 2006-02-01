@@ -31,7 +31,7 @@ void emit_kids ()
 	int i, j, c, n, *si;
 	char **sa;
 
-	if (!with_exported_symbols)
+	if (!exported_symbols_p)
 		output ("static ");
 	output ("int\n");
 	output ("mono_burg_rule (MBState *state, int goal)\n{\n");
@@ -55,7 +55,7 @@ void emit_kids ()
 
 
 	if (dag_mode) {
-		if (!with_exported_symbols)
+		if (!exported_symbols_p)
 			output ("static ");
 		output ("MBState **\n");
 		output ("mono_burg_kids (MBState *state, int rulenr, MBState *kids [])\n{\n");
@@ -63,7 +63,7 @@ void emit_kids ()
 		output ("\tg_return_val_if_fail (kids != NULL, NULL);\n\n");
 
 	} else {
-		if (!with_exported_symbols)
+		if (!exported_symbols_p)
 			output ("static ");
 		output ("MBTREE_TYPE **\n");
 		output ("mono_burg_kids (MBTREE_TYPE *tree, int rulenr, MBTREE_TYPE *kids [])\n{\n");

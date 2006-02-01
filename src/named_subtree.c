@@ -47,7 +47,7 @@ static char *compute_vartree_decs_ (char *prefix, int depth, VarTree *t)
 		GList *varnames = t->varnames;
 
 		for (; varnames; varnames = varnames->next) {
-			if (with_references)
+			if (cxx_ref_p)
 				tmp_res = "%s\tMBTREE_TYPE &%s = *(%s(&tree))";
 			else
 				tmp_res = "%s\tMBTREE_TYPE *%s = (%s(tree))";

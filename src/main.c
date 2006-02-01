@@ -3,7 +3,7 @@
  **
  ** MonoBURG, an iburg like code generator generator.
  **
- ** Copyright (C) 2001, 2002, 2004, 2005 Ximian, Inc.
+ ** Copyright (C) 2001, 2002, 2004, 2005, 2006 Ximian, Inc.
  **
  ** This program is free software; you can redistribute it and/or
  ** modify it under the terms of the GNU General Public License
@@ -30,10 +30,10 @@ static char *header_define = NULL;
 static char *cfile = NULL;
 static char *deffile = NULL;
 static GList *infiles = NULL;
-gboolean with_line = FALSE;
-gboolean with_glib = TRUE;
-gboolean with_exported_symbols = TRUE;
-gboolean with_references = FALSE;
+gboolean lines_p = TRUE;
+gboolean glib_p = TRUE;
+gboolean exported_symbols_p = TRUE;
+gboolean cxx_ref_p = FALSE;
 gboolean dag_mode = 0;
 gboolean predefined_terms = 0;
 
@@ -88,8 +88,9 @@ static void warning_handler (const gchar *log_domain,
 
 static void parse_options (int argc, char **argv)
 {
-	static gboolean without_glib = FALSE;
-	static gboolean without_exported_symbols = FALSE;
+	static gboolean no_lines_p = FALSE;
+	static gboolean no_glib_p = FALSE;
+	static gboolean no_exported_symbols_p = FALSE;
 	static gboolean version = FALSE;
 	int i;
 	GError *error = NULL;
@@ -117,14 +118,14 @@ static void parse_options (int argc, char **argv)
 		  "Set FILE to be the output source code file.", "FILE" },
 		{ "version", 'v', 0, G_OPTION_ARG_NONE, &version,
 		  "Output version number and quit.", NULL },
-		{ "with-line", 'l', 0, G_OPTION_ARG_NONE, &with_line,
-		  "Output `#line' directives.", NULL },
-		{ "without-glib", 0, 0, G_OPTION_ARG_NONE, &without_glib,
+		{ "no-lines", 'l', 0, G_OPTION_ARG_NONE, &no_lines_p,
+		  "Don't output `#line' directives.", NULL },
+		{ "no-glib", 0, 0, G_OPTION_ARG_NONE, &no_glib_p,
 		  "Output a glib independent code.", NULL },
-		{ "without-exported-symbols", 0, 0, G_OPTION_ARG_NONE, &without_exported_symbols,
+		{ "no-exported-symbols", 0, 0, G_OPTION_ARG_NONE, &no_exported_symbols_p,
 		  "Avoid exported symbols as much as possible.", NULL },
-		{ "with-references", 0, 0, G_OPTION_ARG_NONE, &with_references,
-		  "Make emit functions to take references, not pointers.", NULL },
+		{ "cxx-ref", 0, 0, G_OPTION_ARG_NONE, &cxx_ref_p,
+		  "Generate emission functions taking references instead of pointers.", NULL },
 		{ NULL, 0, 0, 0, NULL, NULL, NULL }
 	};
 
@@ -140,12 +141,14 @@ static void parse_options (int argc, char **argv)
 		bad_use (argv[0], error->message);
 	if ((cfile && !deffile) || (!cfile && deffile))
 		bad_use (argv[0], "-s and -d must be precised together");
-	with_glib = !without_glib;
-	with_exported_symbols = !without_exported_symbols;
-	if (with_references)
+	/* Turn `without' options into `with' options.  */
+	lines_p = !no_lines_p;
+	glib_p = !no_glib_p;
+	exported_symbols_p = !no_exported_symbols_p;
+	if (cxx_ref_p)
 	{
-		warn_cxx ("`--with-references' option");
-		g_hash_table_insert (definedvars, g_strdup ("__WITH_REFERENCES"),
+		warn_cxx ("`--cxx-ref' option");
+		g_hash_table_insert (definedvars, g_strdup ("__CXX_REF"),
 				     GUINT_TO_POINTER (1));
 	}
 	for (i = 1; i < argc; ++i)
@@ -173,7 +176,9 @@ int main (int argc, char **argv)
 
 	/* Initialize vars. */
 	definedvars = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
-	include_dirs = g_list_append (include_dirs, ".");
+	/* Add an empty include directory, referring implicitely to the
+	   current directory. */
+	include_dirs = g_list_append (include_dirs, "");
 	parse_options (argc, argv);
 
 	/* Start header file. */
@@ -202,8 +207,13 @@ int main (int argc, char **argv)
 				exit (-1);
 			}
 			input.filename = infile;
-			if (with_line)
+/* FIXME: At this stage, we can emit a #line even if the %no-lines directive
+   might be read later in the grammar.  So, this part has been disabled until
+   the scanner/parser is revamped to handle this case.  */
+#if 0
+			if (lines_p)
 				output ("#line %d \"%s\"\n", 1, infile);
+#endif
 			yyparse ();
 
 			reset_parser ();

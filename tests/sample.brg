@@ -22,6 +22,9 @@ struct _MBTree {
 # comments start with a '#' as first line character
 #
 
+# Don't output #lines, to avoid differences due to the build path.
+%no-lines
+
 #
 # we must fisrt define the terminals
 # with or without numbers

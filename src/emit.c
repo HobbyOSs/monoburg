@@ -3,7 +3,7 @@
  **
  ** MonoBURG, an iburg like code generator generator.
  **
- ** Copyright (C) 2001, 2002, 2004, 2005 Ximian, Inc.
+ ** Copyright (C) 2001, 2002, 2004, 2005, 2006 Ximian, Inc.
  **
  ** This program is free software; you can redistribute it and/or
  ** modify it under the terms of the GNU General Public License
@@ -45,7 +45,7 @@ void output (char *fmt, ...)
 /** Emit includes of external header files. */
 void emit_includes ()
 {
-	if (with_glib) {
+	if (glib_p) {
 		output ("#include <glib.h>\n");
 		output ("\n");
 	}
@@ -57,10 +57,10 @@ void emit_includes ()
 	}
 }
 
-/** Emit header defines, replace glib definitions if !with_glib. */
+/** Emit header defines, replace glib definitions if !glib_p. */
 void emit_header ()
 {
-	if (!with_glib) {
+	if (!glib_p) {
 		output ("#ifndef guint8\n"
 			"# define guint8 unsigned char\n"
 			"#endif /* !guint8 */\n"
@@ -414,7 +414,7 @@ void emit_label_func ()
 
 	output ("}\n\n");
 
-	if (!with_exported_symbols)
+	if (!exported_symbols_p)
 		output ("static ");
 	output ("MBState *\n");
 	output ("mono_burg_label (MBTREE_TYPE *tree, MBCOST_DATA *data)\n{\n");
@@ -455,7 +455,7 @@ void emit_vardefs ()
 
 	if (predefined_terms) {
 		output ("guint8 mono_burg_arity [MBMAX_OPCODES];\n");
-		if (!with_exported_symbols)
+		if (!exported_symbols_p)
 			output ("static ");
 		output ("void\nmono_burg_init (void)\n{\n");
 
@@ -484,7 +484,7 @@ void emit_vardefs ()
 		}
 		output ("};\n\n");
 
-		if (with_exported_symbols) {
+		if (exported_symbols_p) {
 			output ("const char *const mono_burg_term_string [] = {\n");
 			output ("\tNULL,\n");
 			for (l = term_list, i = 0; l; l = l->next) {
@@ -495,7 +495,7 @@ void emit_vardefs ()
 		}
 	}
 
-	if (!with_exported_symbols)
+	if (!exported_symbols_p)
 		output ("static ");
 	output ("const char * const mono_burg_rule_string [] = {\n");
 	output ("\tNULL,\n");
@@ -530,7 +530,7 @@ void emit_vardefs ()
 	}
 	output ("\n");
 
-	if (!with_exported_symbols)
+	if (!exported_symbols_p)
 		output ("static ");
 	output ("const guint16 *const mono_burg_nts [] = {\n");
 	output ("\t0,\n");
@@ -552,12 +552,12 @@ void emit_prototypes ()
 {
 	if (dag_mode)
 		output ("typedef void (*MBEmitFunc) (MBState *state, MBTREE_TYPE %ctree, MBCGEN_TYPE *s);\n\n",
-			(with_references ? '&' : '*'));
+			(cxx_ref_p ? '&' : '*'));
 	else
 		output ("typedef void (*MBEmitFunc) (MBTREE_TYPE %ctree, MBCGEN_TYPE *s);\n\n",
-			(with_references ? '&' : '*'));
+			(cxx_ref_p ? '&' : '*'));
 
-	if (with_exported_symbols) {
+	if (exported_symbols_p) {
 		output ("extern const char * const mono_burg_term_string [];\n");
 		output ("extern const char * const mono_burg_rule_string [];\n");
 		output ("extern const guint16 *const mono_burg_nts [];\n");

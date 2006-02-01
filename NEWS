@@ -1,10 +1,33 @@
-* 1.0.4a
+* New in 1.0.5, 2006-02-01:
 
-** Support `with-references' option as a %-directive
+** Rework MonoBURG options
 
-  Monoburg generates C++ references instead of pointers when using
-  `--with-references', or upon a `%with-references' directive in the
-  input file.
+Instead of `--with-line', provide a `--no-line' option, and output
+`#line' directives by default.
+
+The options
+
+  `--without-glib',
+  `--without-exported-symbols' and
+  `--with-references'
+
+become (respectively)
+
+  `--no-glib',
+  `--no-exported-symbols' and
+  `--cxx-ref'.
+
+** Support options as %-directives
+
+  For instance, MonoBURG generates C++ references instead of pointers
+  when using `--cxx-ref', or upon a `%cxx-ref' directive in the input
+  file.  Idem for `%no-lines', `%no-glib' and `%no-exported-symbols'.
+
+** Improve #line emission
+
+Default include path is now "" instead of "." to avoid things like
+
+  #line 1 "./tree.brg"
 
 * 1.0.4
 

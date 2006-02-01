@@ -29,7 +29,7 @@ void emit_cost_func ()
 	GList *l;
 	int i;
 
-	if (!with_exported_symbols)
+	if (!exported_symbols_p)
 		output ("static int mono_burg_rule (MBState *state, int goal);\n");
 
 	for (l =  rule_list, i = 0; l; l = l->next) {
@@ -44,7 +44,7 @@ void emit_cost_func ()
 				output ("mono_burg_cost_%d (MBState *state, MBCOST_DATA *data)\n", i + 1);
 			else
 				output ("mono_burg_cost_%d (MBTREE_TYPE %ctree, MBCOST_DATA *data)\n", i + 1,
-					(with_references ? '&' : '*'));
+					(cxx_ref_p ? '&' : '*'));
 			output ("{\n");
 			output ("\t(void) data; ");
 			if (dag_mode)
