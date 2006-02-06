@@ -143,6 +143,20 @@ optvarname: /* empty */ { $$ = NULL; }
 
 %%
 
+#define STATIC_STRLEN(Literal_Str)		\
+  sizeof (Literal_Str) - 1
+
+/* A call to strcmp() bounded by the length of LITERAL_STR.  */
+#define BOUND_STRCMP(Str, Literal_Str)			\
+  strncmp (Str, Literal_Str, STATIC_STRLEN (Literal_Str))
+
+#define IS_TOKEN(Token, Str)			\
+  !BOUND_STRCMP(Str, Token) &&			\
+  isspace (*((Str) + STATIC_STRLEN (Token)))
+
+#define EAT(Token, Str)				\
+  Str += STATIC_STRLEN (Token)
+
 #define LASTINPUT ((File *) g_list_last (inputs)->data)
 
 /* We assume that there's no line larger than 2048 chars. */
@@ -161,8 +175,7 @@ fgets_inc(char *s, int size)
   File *new_include;
   GList *include_dir = include_dirs;
 
-  /* 9 == strlen("%include "); */
-  assert (size > 9 + MAX_FILENAME_LEN);
+  assert (size > STATIC_STRLEN ("%include ") + MAX_FILENAME_LEN);
 
   if (fgets (s, size, LASTINPUT->fd) == NULL) {
     if (inputs->next == NULL)
@@ -186,8 +199,8 @@ fgets_inc(char *s, int size)
   LASTINPUT->yylinepos = 1;
 
   n_length = strlen(s);
-  if (strncmp (s, "%include ", 9) == 0) {
-    if (n_length - 9 > MAX_FILENAME_LEN)
+  if (BOUND_STRCMP(s, "%include ") == 0) {
+    if (n_length - STATIC_STRLEN ("%include ") > MAX_FILENAME_LEN)
       yyerror ("`%%include' is referring to a too long filename");
     if (s[n_length - 1] == '\n')
       s[n_length - 1] = 0;
@@ -321,22 +334,22 @@ nextchar (void)
 
         if (state == 1) {
           if (!ll && input[0] == '%') {
-            if (!strncmp (&input[1], "ifdef", 5)) {
-              push_if (&input[6], FALSE);
+            if (!BOUND_STRCMP(&input[1], "ifdef")) {
+              push_if (&input[STATIC_STRLEN ("ifdef") + 1], FALSE);
               ll = TRUE;
               continue;
             }
-            else if (!strncmp (&input[1], "ifndef", 6)) {
-              push_if (&input[7], TRUE);
+	    else if (!BOUND_STRCMP(&input[1], "ifndef")) {
+              push_if (&input[STATIC_STRLEN ("ifndef") + 1], TRUE);
               ll = TRUE;
               continue;
             }
-            else if (!strncmp (&input[1], "else", 4)) {
+            else if (!BOUND_STRCMP(&input[1], "else")) {
               flip_if ();
               ll = TRUE;
               continue;
             }
-            else if (!strncmp (&input[1], "endif", 5)) {
+            else if (!BOUND_STRCMP(&input[1], "endif")) {
               pop_if ();
               ll = TRUE;
               continue;
@@ -399,44 +412,43 @@ yylex (void)
       continue;
 
     if (c == '%') {
-      /* FIXME: Don't hard-code token lengths. */
-      if (!strncmp (next, "start", 5) && isspace (next[5])) {
-	next += 5;
+      if (IS_TOKEN ("start", next)) {
+	EAT ("start", next);
 	return START;
       }
 
-      if (!strncmp (next, "termprefix", 10) && isspace (next[10])) {
-	next += 10;
+      if (IS_TOKEN ("termprefix", next)) {
+	EAT ("termprefix", next);
 	return TERMPREFIX;
       }
 
-      if (!strncmp (next, "term", 4) && isspace (next[4])) {
-	next += 4;
+      if (IS_TOKEN ("term", next)) {
+	EAT ("term", next);
 	return TERM;
       }
 
-      if (!strncmp (next, "namespace", 9) && isspace (next[9])) {
-	next += 9;
+      if (IS_TOKEN ("namespace", next)) {
+	EAT ("namespace", next);
 	return NAMESPACE;
       }
 
-      if (!strncmp (next, "no-lines", 8) && isspace (next[8])) {
-	next += 8;
+      if (IS_TOKEN ("no-lines", next)) {
+	EAT ("no-lines", next);
 	return NO_LINES;
       }
 
-      if (!strncmp (next, "no-glib", 7) && isspace (next[7])) {
-	next += 7;
+      if (IS_TOKEN ("no-glib", next)) {
+	EAT ("no-glib", next);
 	return NO_GLIB;
       }
 
-      if (!strncmp (next, "no-exported-symbols", 19) && isspace (next[19])) {
-	next += 19;
+      if (IS_TOKEN ("no-exported-symbols", next)) {
+	EAT ("no-exported-symbols", next);
 	return NO_EXPORTED_SYMBOLS;
       }
 
-      if (!strncmp (next, "cxx-ref", 7) && isspace (next[7])) {
-	next += 7;
+      if (IS_TOKEN ("cxx-ref", next)) {
+	EAT ("cxx-ref", next);
 	return CXX_REF;
       }
 
@@ -458,8 +470,8 @@ yylex (void)
       char *n = next;
       int l;
 
-      if (!strncmp (next - 1, "cost", 4) && isspace (next[3])) {
-	next += 4;
+      if (IS_TOKEN ("cost", next - 1)) {
+	EAT ("cost", next);
 	return COST;
       }
 
@@ -514,3 +526,8 @@ yylex (void)
 
   } while (1);
 }
+
+#undef EAT
+#undef IS_TOKEN
+#undef BOUND_STRCMP
+#undef STATIC_STRLEN

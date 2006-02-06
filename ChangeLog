@@ -1,3 +1,13 @@
+2006-02-06  Roland Levillain  <roland@lrde.epita.fr>
+
+	Remove hard-coded numeric values.
+
+	* src/parser.y (STATIC_STRLEN, BOUND_STRCMP, IS_TOKEN, EAT): New
+	macros.
+	(fgets_inc, nextchar, yylex): Use them to remove hard-coded
+	numeric values.
+	* tests/sample.brg: Typo.
+
 2006-02-01  Roland Levillain  <roland@lrde.epita.fr>
 
 	* configure.ac: Bump to 1.0.5a.

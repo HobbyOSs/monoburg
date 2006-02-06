@@ -26,7 +26,7 @@ struct _MBTree {
 %no-lines
 
 #
-# we must fisrt define the terminals
+# we must first define the terminals
 # with or without numbers
 # 
 %term Assign Constant Fetch=3 Four=8 Mul=5 Plus=6 AltFetch=7
