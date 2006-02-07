@@ -144,18 +144,18 @@ optvarname: /* empty */ { $$ = NULL; }
 %%
 
 #define STATIC_STRLEN(Literal_Str)		\
-  sizeof (Literal_Str) - 1
+  (sizeof (Literal_Str) - 1)
 
 /* A call to strcmp() bounded by the length of LITERAL_STR.  */
 #define BOUND_STRCMP(Str, Literal_Str)			\
   strncmp (Str, Literal_Str, STATIC_STRLEN (Literal_Str))
 
 #define IS_TOKEN(Token, Str)			\
-  !BOUND_STRCMP(Str, Token) &&			\
-  isspace (*((Str) + STATIC_STRLEN (Token)))
+  (!BOUND_STRCMP(Str, Token) &&			\
+   isspace (*((Str) + STATIC_STRLEN (Token))))
 
 #define EAT(Token, Str)				\
-  Str += STATIC_STRLEN (Token)
+  (Str += STATIC_STRLEN (Token))
 
 #define LASTINPUT ((File *) g_list_last (inputs)->data)
 

@@ -1,3 +1,8 @@
+2006-02-07  Roland Levillain  <roland@lrde.epita.fr>
+
+	* src/parser.y (STATIC_STRLEN, IS_TOKEN, EAT): Protect macros
+	from side effects.
+
 2006-02-06  Roland Levillain  <roland@lrde.epita.fr>
 
 	Remove hard-coded numeric values.
