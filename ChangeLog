@@ -34,16 +34,16 @@
 	(NO_LINES, NO_GLIB, NO_EXPORTED_SYMBOLS): New tokens.
 	(yylex): Generate these tokens.
 	(decls): Use them in this production to recognize new
-	\%-directives.
+	%-directives.
 	(fgets_inc): Don't print empty include dirs.
-	* tests/sample.brg: Use \%no-lines.
+	* tests/sample.brg: Use %no-lines.
 
 	* src/main.c (with_line, with_glib, with_exported_symbols)
 	(with_references): Rename as...
 	(lines_p, glib_p, exported_symbols_p, cxx_ref_p): ...these.
 	(parse_options): Adjust.
 	* src/monoburg.h,
-	* src/emit.c (emit_includes, emit_header, emit_label_func) 
+	* src/emit.c (emit_includes, emit_header, emit_label_func)
 	(emit_vardefs, emit_vardefs, emit_prototypes)
 	* src/emit_cost.c (emit_cost_func)
 	* src/emit_kids.c (emit_kids)
@@ -58,7 +58,7 @@
 2006-01-19  Roland Levillain  <roland@lrde.epita.fr>
 
 	* src/parser.y: Handle `with-references' option as a MonoBURG
-	\%-directive.
+	%-directive.
 
 2006-01-19  Roland Levillain  <roland@lrde.epita.fr>
 
@@ -77,26 +77,26 @@
 	* src/named_subtree.h,
 	* src/named_subtree.c: New. Named subtree related functions.
 	Allow use in multi-rules.
-	
+
 	* src/rule.c,
 	* src/rule.h: Move named subtree related functions to
 	`src/named_subtree.[ch]'.
 	Move memory cleaning related functions to `src/mem_clean.[ch]'
-	
+
 	* src/mem_clean.c,
 	* src/mem_clean.h: New. Memory cleaning related functions.
-	
+
 	* src/emit_files.c: Use `mem_clean.h'.
-	
+
 	* src/parser.y,
 	* src/emit_functions.c,
 	* src/emit_cost.c: Allow named subtree in multi-rules.
-	
+
 	* src/main.c: Fix to (close to) compile with -pedantic.
-	
+
 	* src/Makefile.am: Add new files.
 	* tests/sample.c.ref: Regen.
-	
+
 	* configure.ac,
 	* NEWS: Bump to 1.0.4.
 
@@ -104,7 +104,6 @@
 
 	* tests/Makefile.am: Use diff(1) instead of cmp(1) if VERBOSE is set.
 	Copy the failing C file to `file.c.fail'.
-
 
 2005-09-16  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
@@ -146,7 +145,6 @@
 	* tests/Makefile.am: Add test facilities.
 	* tests/sample.c.ref: New. Add reference code for
 	tests/sample.brg.
-	
 
 2005-09-09  Michael Cadilhac  <michael.cadilhac@lrde.epita.fr>
 
