@@ -11,11 +11,6 @@ Suggestions
 
   This is nicer but it needs an external file to be installed.
 
-* Move options as %-directives in the prelude of the grammar.
-
-  I.e., things like %no-line, %cxx-ref, etc. should appear before the
-  first %%, as in Bison.
-
 * Reserve %include for brg files?
 
   Instead of allowing an %include directive in the prelude, we might
@@ -44,6 +39,14 @@ Suggestions
   dependency on another tool, which Mono developers might not want); or
   rewrite it.
 
+* Postponed output emission.
+
+  Don't write the output file during the parsing, as options can be
+  passed as %-directives. This options may affect the output files, so
+  we should parse the input file(s) entirely, and only then start
+  emitting output files.
+
+  See how Bison handle this.
 
 
 Local Variables:
@@ -51,4 +54,4 @@ mode: outline
 ispell-local-dictionary: "american"
 End:
 
-LocalWords:  MonoBURG Lex
+LocalWords:  MonoBURG Lex brg ispell american
