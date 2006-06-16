@@ -1,3 +1,7 @@
+* New in 1.0.5a:
+
+
+
 * New in 1.0.5, 2006-02-01:
 
 ** Rework MonoBURG options
@@ -28,6 +32,7 @@ become (respectively)
 Default include path is now "" instead of "." to avoid things like
 
   #line 1 "./tree.brg"
+
 
 * 1.0.4
 
@@ -38,6 +43,7 @@ Default include path is now "" instead of "." to avoid things like
 	num: Moins (Name3 : num, Name4 : num)
   Moreover, Name3 could be renamed Name1. The only restriction
   is that Name4 couldn't be named Name1 nor Name3.
+
 
 * 1.0.3
 
@@ -52,6 +58,7 @@ Default include path is now "" instead of "." to avoid things like
 ** Remove limits on some features
 
   Depths of `%namespace' and `%include' are no more limited.
+
 
 * 1.0.2a
 
