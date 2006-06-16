@@ -1,5 +1,12 @@
 2006-06-16  Roland Levillain  <roland@lrde.epita.fr>
 
+	Fix the recipient of Vcs' messages.
+
+	* vcs/monoburg.rb (Vcs::monoburg_commit): Send messages to
+	projects@lrde.epita.fr.
+
+2006-06-16  Roland Levillain  <roland@lrde.epita.fr>
+
 	* NEWS: Update.
 
 2006-03-21  Roland Levillain  <roland@lrde.epita.fr>

@@ -7,7 +7,7 @@ class Vcs
   
   def monoburg_commit! ( *args )
     common_commit!("monoburg <%= rev %>: <%= title %>", *args) do |subject|
-      mail!(:to => %w[tiger-patches@lrde.epita.fr], :subject => subject)
+      mail!(:to => %w[projects@lrde.epita.fr], :subject => subject)
     end
   end
   alias_command :mbci, :monoburg_commit
