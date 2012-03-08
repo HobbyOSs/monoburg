@@ -1,5 +1,9 @@
 2012-03-08  Roland Levillain  <roland@lrde.epita.fr>
 
+	* INSTALL: Update.
+
+2012-03-08  Roland Levillain  <roland@lrde.epita.fr>
+
 	Do not use GNU Make features gratuitously.
 
 	* tests/Makefile.am (SUFFIXES): New.
