@@ -1,3 +1,11 @@
+2012-03-08  Roland Levillain  <roland@lrde.epita.fr>
+
+	Do not use GNU Make features gratuitously.
+
+	* tests/Makefile.am (SUFFIXES): New.
+	(%.c, %.test): Turn these pattern rules into...
+	(.brg.c, .c.test): ...these suffix rules.
+
 2006-06-16  Roland Levillain  <roland@lrde.epita.fr>
 
 	Fix the recipient of Vcs' messages.

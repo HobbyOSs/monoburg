@@ -2,7 +2,7 @@
 ##
 ## MonoBURG, an iburg like code generator generator.
 ##
-## Copyright (C) 2001, 2002, 2004, 2005 Ximian, Inc.
+## Copyright (C) 2001, 2002, 2004, 2005, 2012 Ximian, Inc.
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -22,11 +22,12 @@ TESTS = sample.test
 $(top_builddir)/src/monoburg$(EXEEXT):
 	cd $(top_builddir)/src && $(MAKE) $(AM_MAKEFLAGS) monoburg$(EXEEXT)
 
-## Uses GNU Make features.
-%.c: %.brg $(top_builddir)/src/monoburg$(EXEEXT)
+SUFFIXES = .brg .test
+
+.brg.c: $(top_builddir)/src/monoburg$(EXEEXT)
 	$(top_builddir)/src/monoburg$(EXEEXT) $< > $@
 
-%.test: %.c
+.c.test:
 	diff_tool=diff;					\
 	test x$(VERBOSE) = x && diff_tool=cmp;		\
 	if ! $$diff_tool $< $(srcdir)/$<.ref; then	\
