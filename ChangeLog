@@ -1,3 +1,24 @@
+2012-03-20  Roland Levillain  <roland@lrde.epita.fr>
+
+	Version 1.0.6.
+
+	* configure.ac: Here.
+	Use `build-aux' as auxiliary directory instead of `config'.
+	No longer configure config/Makefile.
+	Pass option `-Wall' to automake.
+	Quote all macros' arguments.
+	* NEWS: Update.
+	* TODO: Typo.
+	* Makefile.am (SUBDIRS): Remove config.
+	(EXTRA_DIST): Remove ChangeLog (automatically distributed).
+	* config/Makefile: Remove.
+	* man/Makefile.am (man_MANS): Rename as...
+	(dist_man_MANS): ...this.
+	(EXTRA_DIST): Remove.
+	* src/Makefile.am (INCLUDES): Rename as...
+	(AM_CFLAGS): ...this.
+	Remove -I$(srcdir).
+
 2012-03-08  Roland Levillain  <roland@lrde.epita.fr>
 
 	* INSTALL: Update.

@@ -2,7 +2,7 @@
 ##
 ## MonoBURG, an iburg like code generator generator.
 ##
-## Copyright (C) 2001, 2002, 2004, 2005 Ximian, Inc.
+## Copyright (C) 2001, 2002, 2004, 2005, 2012 Ximian, Inc.
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -12,7 +12,7 @@
 ## The complete GNU General Public Licence Notice can be found as the
 ## `NOTICE' file in the root directory.
 
-INCLUDES = $(GLIB_CFLAGS) -I$(srcdir)
+AM_CFLAGS = $(GLIB_CFLAGS)
 
 bin_PROGRAMS = monoburg
 

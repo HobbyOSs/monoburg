@@ -46,7 +46,7 @@ Suggestions
   we should parse the input file(s) entirely, and only then start
   emitting output files.
 
-  See how Bison handle this.
+  See how Bison handles this.
 
 
 Local Variables:

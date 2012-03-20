@@ -2,7 +2,7 @@
 ##
 ## MonoBURG, an iburg like code generator generator.
 ##
-## Copyright (C) 2001, 2002, 2004, 2005 Ximian, Inc.
+## Copyright (C) 2001, 2002, 2004, 2005, 2012 Ximian, Inc.
 ##
 ## This program is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License
@@ -14,21 +14,20 @@
 
 ## -------------------------------------
 ## Project
-AC_INIT([MonoBURG], [1.0.5a])
+AC_INIT([MonoBURG], [1.0.6])
 AM_CONFIG_HEADER([config.h])
 
 ## -------------------------------------
-## Setup autotools
+## Set up the Autotools
 
 # Need autoconf 2.57 at least.
 AC_PREREQ([2.57])
 
 # Auxiliary files.
-AC_CONFIG_AUX_DIR([config])
-AC_CONFIG_FILES([config/Makefile])
+AC_CONFIG_AUX_DIR([build-aux])
 
 # Initiate automake.
-AM_INIT_AUTOMAKE([1.7.5 dist-bzip2 check-news])
+AM_INIT_AUTOMAKE([1.7.5 dist-bzip2 check-news -Wall])
 
 ## -------------------------------------
 ## Development tools
@@ -43,8 +42,8 @@ AC_PROG_YACC
 ## Environment
 
 # Check for GLib 2.6 presence.
-PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.6, ,
-                  AC_MSG_ERROR([Glib 2.6 or newer is required]))
+PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.6], ,
+                  [AC_MSG_ERROR([Glib 2.6 or newer is required])])
 
 ## -------------------------------------
 ## Epilogue

@@ -10,7 +10,4 @@ Makefile.in
 /config.h.in
 /configure
 
-/config/depcomp
-/config/install-sh
-/config/missing
-/config/ylwrap
+/build-aux/

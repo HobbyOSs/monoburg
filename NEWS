@@ -1,5 +1,11 @@
-* New in 1.0.5a:
+* New in 1.0.6, 2012-03-20:
 
+Mostly a maintenance release.
+
+** Remove hard-coded numeric values from the code.
+** Do not require GNU Make.
+** Rename directory `config' as `build-aux'.
+** Simplify the Makefile machinery.
 
 
 * New in 1.0.5, 2006-02-01:
@@ -67,6 +73,8 @@ Default include path is now "" instead of "." to avoid things like
   Sources are split into several files, and are documented using
   Doxygen.  The GNU Build System is used.
 
+
 Local Variables:
 mode: outline
+ispell-local-dictionary: "american"
 End:
