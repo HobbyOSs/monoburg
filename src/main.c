@@ -19,7 +19,7 @@
  */
 
 #include <stdlib.h>
-#include <glib/goption.h>
+#include <glib.h>
 #include "monoburg.h"
 #include "check.h"
 #include "parser.h"
