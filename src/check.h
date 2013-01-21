@@ -21,6 +21,6 @@
 #ifndef __MONO_CHECK_H__
 # define __MONO_CHECK_H__
 
-void	check_result ();
+void    check_result ();
 
 #endif /* __MONO_CHECK_H__ */

@@ -25,26 +25,26 @@
 /** Emit `fill' and then pretty print the rule in comment. */
 void emit_rule_string (Rule *rule, char *fill)
 {
-	output ("%s/* ", fill);
-	output ("%s: ", rule->lhs->name);
-	emit_tree_string (rule->tree);
-	output (" */\n");
+        output ("%s/* ", fill);
+        output ("%s: ", rule->lhs->name);
+        emit_tree_string (rule->tree);
+        output (" */\n");
 }
 
 /** Pretty print a rule tree. */
 void emit_tree_string (Tree *tree)
 {
-	if (tree->op) {
-		output ("%s", tree->op->name);
-		if (tree->op->arity) {
-			output ("(");
-			emit_tree_string (tree->left);
-			if (tree->right) {
-				output (", ");
-				emit_tree_string (tree->right);
-			}
-			output (")");
-		}
-	} else
-		output ("%s", tree->nonterm->name);
+        if (tree->op) {
+                output ("%s", tree->op->name);
+                if (tree->op->arity) {
+                        output ("(");
+                        emit_tree_string (tree->left);
+                        if (tree->right) {
+                                output (", ");
+                                emit_tree_string (tree->right);
+                        }
+                        output (")");
+                }
+        } else
+                output ("%s", tree->nonterm->name);
 }

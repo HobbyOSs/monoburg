@@ -27,10 +27,10 @@
 
 typedef struct _File File;
 struct _File {
-	int yylineno;
-	int yylinepos;
-	char *filename;
-	FILE *fd;
+        int yylineno;
+        int yylinepos;
+        char *filename;
+        FILE *fd;
 };
 
 extern GList *inputs;
@@ -40,9 +40,9 @@ extern GList *include_dirs;
 
 extern GHashTable *definedvars;
 
-void	 yyerror (char *fmt, ...);
-int	 yylex   (void);
-int	 yyparse (void);
+void     yyerror (char *fmt, ...);
+int      yylex   (void);
+int      yyparse (void);
 void     yyparsetail    (void);
 void     reset_parser (void);
 

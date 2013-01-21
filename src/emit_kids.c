@@ -27,94 +27,94 @@ static char *compute_kids (char *ts, Tree *tree, int *n);
 /** Emit `mono_burg_rule' and `mono_burg_kids'. */
 void emit_kids ()
 {
-	GList *l, *nl;
-	int i, j, c, n, *si;
-	char **sa;
+        GList *l, *nl;
+        int i, j, c, n, *si;
+        char **sa;
 
-	if (!exported_symbols_p)
-		output ("static ");
-	output ("int\n");
-	output ("mono_burg_rule (MBState *state, int goal)\n{\n");
+        if (!exported_symbols_p)
+                output ("static ");
+        output ("int\n");
+        output ("mono_burg_rule (MBState *state, int goal)\n{\n");
 
-	output ("\tg_return_val_if_fail (state != NULL, 0);\n");
-	output ("\tg_return_val_if_fail (goal > 0, 0);\n\n");
+        output ("\tg_return_val_if_fail (state != NULL, 0);\n");
+        output ("\tg_return_val_if_fail (goal > 0, 0);\n\n");
 
-	output ("\tswitch (goal) {\n");
+        output ("\tswitch (goal) {\n");
 
-	for (nl = nonterm_list; nl; nl = nl->next) {
-		NonTerm *n = (NonTerm *)nl->data;
-		output ("\tcase MB_NTERM_%s:\n", n->name);
-		output ("\t\treturn mono_burg_decode_%s [state->rule_%s];\n",
-			n->name, n->name);
-	}
+        for (nl = nonterm_list; nl; nl = nl->next) {
+                NonTerm *n = (NonTerm *)nl->data;
+                output ("\tcase MB_NTERM_%s:\n", n->name);
+                output ("\t\treturn mono_burg_decode_%s [state->rule_%s];\n",
+                        n->name, n->name);
+        }
 
-	output ("\tdefault: g_assert_not_reached ();\n");
-	output ("\t}\n");
-	output ("\treturn 0;\n");
-	output ("}\n\n");
+        output ("\tdefault: g_assert_not_reached ();\n");
+        output ("\t}\n");
+        output ("\treturn 0;\n");
+        output ("}\n\n");
 
 
-	if (dag_mode) {
-		if (!exported_symbols_p)
-			output ("static ");
-		output ("MBState **\n");
-		output ("mono_burg_kids (MBState *state, int rulenr, MBState *kids [])\n{\n");
-		output ("\tg_return_val_if_fail (state != NULL, NULL);\n");
-		output ("\tg_return_val_if_fail (kids != NULL, NULL);\n\n");
+        if (dag_mode) {
+                if (!exported_symbols_p)
+                        output ("static ");
+                output ("MBState **\n");
+                output ("mono_burg_kids (MBState *state, int rulenr, MBState *kids [])\n{\n");
+                output ("\tg_return_val_if_fail (state != NULL, NULL);\n");
+                output ("\tg_return_val_if_fail (kids != NULL, NULL);\n\n");
 
-	} else {
-		if (!exported_symbols_p)
-			output ("static ");
-		output ("MBTREE_TYPE **\n");
-		output ("mono_burg_kids (MBTREE_TYPE *tree, int rulenr, MBTREE_TYPE *kids [])\n{\n");
-		output ("\tg_return_val_if_fail (tree != NULL, NULL);\n");
-		output ("\tg_return_val_if_fail (kids != NULL, NULL);\n\n");
-	}
+        } else {
+                if (!exported_symbols_p)
+                        output ("static ");
+                output ("MBTREE_TYPE **\n");
+                output ("mono_burg_kids (MBTREE_TYPE *tree, int rulenr, MBTREE_TYPE *kids [])\n{\n");
+                output ("\tg_return_val_if_fail (tree != NULL, NULL);\n");
+                output ("\tg_return_val_if_fail (kids != NULL, NULL);\n\n");
+        }
 
-	output ("\tswitch (rulenr) {\n");
+        output ("\tswitch (rulenr) {\n");
 
-	n = g_list_length (rule_list);
-	sa = g_new0 (char *, n);
-	si = g_new0 (int, n);
+        n = g_list_length (rule_list);
+        sa = g_new0 (char *, n);
+        si = g_new0 (int, n);
 
-	/* compress the case statement */
-	for (l = rule_list, i = 0, c = 0; l; l = l->next) {
-		Rule *rule = (Rule *)l->data;
-		int kn = 0;
-		char *k;
+        /* compress the case statement */
+        for (l = rule_list, i = 0, c = 0; l; l = l->next) {
+                Rule *rule = (Rule *)l->data;
+                int kn = 0;
+                char *k;
 
-		if (dag_mode)
-			k = compute_kids ("state", rule->tree, &kn);
-		else
-			k = compute_kids ("tree", rule->tree, &kn);
+                if (dag_mode)
+                        k = compute_kids ("state", rule->tree, &kn);
+                else
+                        k = compute_kids ("tree", rule->tree, &kn);
 
-		for (j = 0; j < c; j++)
-			if (!strcmp (sa [j], k))
-				break;
+                for (j = 0; j < c; j++)
+                        if (!strcmp (sa [j], k))
+                                break;
 
-		si [i++] = j;
-		if (j == c)
-			sa [c++] = k;
-		else
-			g_free (k);
-	}
+                si [i++] = j;
+                if (j == c)
+                        sa [c++] = k;
+                else
+                        g_free (k);
+        }
 
-	for (i = 0; i < c; i++) {
-		for (l = rule_list, j = 0; l; l = l->next, j++)
-			if (i == si [j])
-				output ("\tcase %d:\n", j + 1);
-		output ("%s", sa [i]);
-		output ("\t\tbreak;\n");
-	}
-	while (c--)
-		g_free (sa [c]);
-	g_free (sa);
-	g_free (si);
+        for (i = 0; i < c; i++) {
+                for (l = rule_list, j = 0; l; l = l->next, j++)
+                        if (i == si [j])
+                                output ("\tcase %d:\n", j + 1);
+                output ("%s", sa [i]);
+                output ("\t\tbreak;\n");
+        }
+        while (c--)
+                g_free (sa [c]);
+        g_free (sa);
+        g_free (si);
 
-	output ("\tdefault:\n\t\tg_assert_not_reached ();\n");
-	output ("\t}\n");
-	output ("\treturn kids;\n");
-	output ("}\n\n");
+        output ("\tdefault:\n\t\tg_assert_not_reached ();\n");
+        output ("\t}\n");
+        output ("\treturn kids;\n");
+        output ("}\n\n");
 
 }
 
@@ -122,41 +122,41 @@ void emit_kids ()
 /** Emit kids affectation. */
 static char *compute_kids (char *ts, Tree *tree, int *n)
 {
-	char *res;
+        char *res;
 
-	if (tree->nonterm) {
-		return g_strdup_printf ("\t\tkids[%d] = %s;\n", (*n)++, ts);
-	} else if (tree->op && tree->op->arity) {
-		char *res2 = NULL;
-		char *tmp;
-		char *result;
+        if (tree->nonterm) {
+                return g_strdup_printf ("\t\tkids[%d] = %s;\n", (*n)++, ts);
+        } else if (tree->op && tree->op->arity) {
+                char *res2 = NULL;
+                char *tmp;
+                char *result;
 
-		if (dag_mode) {
-			tmp = g_strdup_printf ("%s->left", ts);
-			res = compute_kids (tmp, tree->left, n);
-			g_free (tmp);
-			if (tree->op->arity == 2) {
-				tmp = g_strdup_printf ("%s->right", ts);
-				res2 = compute_kids (tmp, tree->right, n);
-				g_free (tmp);
-			}
-		} else {
-			tmp = g_strdup_printf ("MBTREE_LEFT(%s)", ts);
-			res = compute_kids (tmp, tree->left, n);
-			g_free (tmp);
-			if (tree->op->arity == 2)
-			{
-				tmp = g_strdup_printf ("MBTREE_RIGHT(%s)", ts);
-				res2 = compute_kids (tmp, tree->right, n);
-				g_free (tmp);
-			}
-		}
+                if (dag_mode) {
+                        tmp = g_strdup_printf ("%s->left", ts);
+                        res = compute_kids (tmp, tree->left, n);
+                        g_free (tmp);
+                        if (tree->op->arity == 2) {
+                                tmp = g_strdup_printf ("%s->right", ts);
+                                res2 = compute_kids (tmp, tree->right, n);
+                                g_free (tmp);
+                        }
+                } else {
+                        tmp = g_strdup_printf ("MBTREE_LEFT(%s)", ts);
+                        res = compute_kids (tmp, tree->left, n);
+                        g_free (tmp);
+                        if (tree->op->arity == 2)
+                        {
+                                tmp = g_strdup_printf ("MBTREE_RIGHT(%s)", ts);
+                                res2 = compute_kids (tmp, tree->right, n);
+                                g_free (tmp);
+                        }
+                }
 
-		result = g_strconcat (res, res2, NULL);
-		g_free (res);
-		g_free (res2);
-		return result;
-	}
-	return g_strdup ("");
+                result = g_strconcat (res, res2, NULL);
+                g_free (res);
+                g_free (res2);
+                return result;
+        }
+        return g_strdup ("");
 }
 

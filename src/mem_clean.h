@@ -21,8 +21,8 @@
 #ifndef __MONO_MEM_CLEAN_H__
 # define __MONO_MEM_CLEAN_H__
 
-void	 free_rules	(void);
-void	 free_terms	(void);
-void	 free_nonterms	(void);
+void     free_rules     (void);
+void     free_terms     (void);
+void     free_nonterms  (void);
 
 #endif /* __MONO_MEM_CLEAN_H__ */

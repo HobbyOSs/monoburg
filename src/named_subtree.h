@@ -23,8 +23,8 @@
 
 # include "rule.h"
 
-char	*compute_vartree_decs	(VarTree *t);
-char	*compute_vartree_void_use (VarTree *t);
-void	 fill_vartree		(VarTree **p_vartree, Tree *tree);
+char    *compute_vartree_decs   (VarTree *t);
+char    *compute_vartree_void_use (VarTree *t);
+void     fill_vartree           (VarTree **p_vartree, Tree *tree);
 
 #endif /* __MONO_NAMED_SUBTREE_H__ */

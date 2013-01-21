@@ -28,41 +28,41 @@ static void mark_reached (Tree *tree);
     each non terminal symbols and arity of terminals. */
 void check_result ()
 {
-	GList *l;
+        GList *l;
 
-	for (l = term_list; l; l = l->next) {
-		Term *term = (Term *)l->data;
-		if (term->arity == -1)
-			g_warning ("unused terminal \"%s\"",term->name);
-	}
+        for (l = term_list; l; l = l->next) {
+                Term *term = (Term *)l->data;
+                if (term->arity == -1)
+                        g_warning ("unused terminal \"%s\"",term->name);
+        }
 
-	if (nonterm_list)
-	  check_reach (((NonTerm *)nonterm_list->data));
+        if (nonterm_list)
+          check_reach (((NonTerm *)nonterm_list->data));
 
-	for (l = nonterm_list; l; l = l->next) {
-		NonTerm *n = (NonTerm *)l->data;
-		if (!n->reached)
-			g_warning ("unreachable nonterm \"%s\"", n->name);
-	}
+        for (l = nonterm_list; l; l = l->next) {
+                NonTerm *n = (NonTerm *)l->data;
+                if (!n->reached)
+                        g_warning ("unreachable nonterm \"%s\"", n->name);
+        }
 }
 
 static void check_reach (NonTerm *n)
 {
-	GList *l;
+        GList *l;
 
-	n->reached = 1;
-	for (l = n->rules; l; l = l->next) {
-		Rule *rule = (Rule *)l->data;
-		mark_reached (rule->tree);
-	}
+        n->reached = 1;
+        for (l = n->rules; l; l = l->next) {
+                Rule *rule = (Rule *)l->data;
+                mark_reached (rule->tree);
+        }
 }
 
 static void mark_reached (Tree *tree)
 {
-	if (tree->nonterm && !tree->nonterm->reached)
-		check_reach (tree->nonterm);
-	if (tree->left)
-		mark_reached (tree->left);
-	if (tree->right)
-		mark_reached (tree->right);
+        if (tree->nonterm && !tree->nonterm->reached)
+                check_reach (tree->nonterm);
+        if (tree->left)
+                mark_reached (tree->left);
+        if (tree->right)
+                mark_reached (tree->right);
 }
