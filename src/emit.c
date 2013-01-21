@@ -37,9 +37,21 @@ void output (char *fmt, ...)
 {
   va_list ap;
 
+  /* Replace all the tabulations by two spaces.  */
+  char *cp, *cp2;
   va_start(ap, fmt);
-  vfprintf (outputfd, fmt, ap);
+  cp = g_strdup_vprintf(fmt, ap);
   va_end (ap);
+
+  for (cp2 = cp; *cp2; ++cp2)
+    if (*cp2 == '\t')
+      {
+        putc (' ', outputfd);
+        putc (' ', outputfd);
+      }
+    else
+      putc (*cp2, outputfd);
+  g_free (cp);
 }
 
 /** Emit includes of external header files. */
