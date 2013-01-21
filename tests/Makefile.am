@@ -28,9 +28,9 @@ SUFFIXES = .brg .test
 	$(top_builddir)/src/monoburg$(EXEEXT) $< > $@
 
 .c.test:
-	diff_tool=diff;					\
+	diff_tool='diff -u';				\
 	test x$(VERBOSE) = x && diff_tool=cmp;		\
-	if ! $$diff_tool $< $(srcdir)/$<.ref; then	\
+	if ! $$diff_tool $(srcdir)/$<.ref $<; then	\
 		cp -f $< $<.fail;			\
 		echo 'rm $$0; exit 1' > $@;		\
 	else						\
