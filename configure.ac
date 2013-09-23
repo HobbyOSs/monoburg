@@ -14,7 +14,7 @@
 
 ## -------------------------------------
 ## Project
-AC_INIT([MonoBURG], [1.0.6])
+AC_INIT([MonoBURG], [1.0.6a])
 AC_CONFIG_HEADERS([config.h])
 
 ## -------------------------------------
@@ -27,7 +27,7 @@ AC_PREREQ([2.57])
 AC_CONFIG_AUX_DIR([build-aux])
 
 # Initiate automake.
-AM_INIT_AUTOMAKE([1.12 silent-rules dist-bzip2 check-news -Wall])
+AM_INIT_AUTOMAKE([1.11 silent-rules dist-bzip2 check-news -Wall])
 AM_SILENT_RULES([yes])
 
 ## -------------------------------------
