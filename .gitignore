@@ -11,4 +11,7 @@ Makefile.in
 /configure
 /INSTALL
 
-/build-aux/
+/build-aux/depcomp
+/build-aux/install-sh
+/build-aux/missing
+/build-aux/ylwrap
