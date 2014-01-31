@@ -12,6 +12,8 @@
 ## The complete GNU General Public Licence Notice can be found as the
 ## `NOTICE' file in the root directory.
 
+m4_pattern_forbid([^PKG_])
+
 ## -------------------------------------
 ## Project
 AC_INIT([MonoBURG], [1.0.6a])

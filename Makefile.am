@@ -12,6 +12,7 @@
 ## The complete GNU General Public Licence Notice can be found as the
 ## `NOTICE' file in the root directory.
 
+ACLOCAL_AMFLAGS = -I build-aux
 SUBDIRS = src tests man
 EXTRA_DIST = bootstrap NOTICE
 
