@@ -11,7 +11,9 @@ Makefile.in
 /configure
 /INSTALL
 
+/build-aux/compile
 /build-aux/depcomp
 /build-aux/install-sh
 /build-aux/missing
+/build-aux/test-driver
 /build-aux/ylwrap
