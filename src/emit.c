@@ -85,7 +85,7 @@ void emit_header ()
             "\n");
 
     output ("#ifndef g_new\n"
-            "static void *\n"
+            "inline static void *\n"
             "mono_burg_xmalloc_ (size_t size)\n"
             "{\n"
             "       void *p;\n"
@@ -102,7 +102,7 @@ void emit_header ()
             "\n");
 
     output ("#ifndef g_error\n"
-            "static int\n"
+            "inline static int\n"
             "mono_burg_error_ (const char *format, ...)\n"
             "{\n"
             "       int n = 0;\n"
