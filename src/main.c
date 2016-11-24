@@ -170,8 +170,7 @@ int main (int argc, char **argv)
 
 #ifndef NDEBUG
         /* Install our allocator, to ease leak detection. */
-        list_allocator = g_allocator_new ("List Allocator", 1024);
-        g_list_push_allocator (list_allocator);
+        list_allocator = g_slice_alloc (1024);
 #endif
 
         /* Initialize vars. */
@@ -288,13 +287,11 @@ int main (int argc, char **argv)
         }
         g_list_free (include_dirs);
 #ifndef NDEBUG
-        g_list_pop_allocator ();
-        g_allocator_free (list_allocator);
+        g_slice_free1 (1024, list_allocator);
 #endif
 
         /* Remove log handler. */
         g_log_remove_handler (NULL, handler_id);
-        g_free (g_get_prgname ());
 
         return 0;
 }

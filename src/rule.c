@@ -154,9 +154,9 @@ Tree *create_tree (char *id, char *varname, Tree *left, Tree *right)
         return tree;
 }
 
-static void check_term_num (char *key, Term *value, int num)
+static void check_term_num (char *key, Term *value, int* num)
 {
-        if (num != -1 && value->number == num)
+        if (*num != -1 && value->number == *num)
                 yyerror ("duplicate terminal id \"%s\"", key);
 }
 
@@ -181,7 +181,7 @@ Term *create_term (char *id, int num)
         if (!term_hash)
                 term_hash = g_hash_table_new (g_str_hash, g_str_equal);
 
-        g_hash_table_foreach (term_hash, (GHFunc) check_term_num, (gpointer) num);
+        g_hash_table_foreach (term_hash, (GHFunc) check_term_num, (gpointer) &num);
 
         term = g_new0 (Term, 1);
 
