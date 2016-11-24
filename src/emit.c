@@ -359,7 +359,8 @@ void emit_label_func ()
   output ("\t}\n\n");
 
   output ("\tarity = (left != NULL) + (right != NULL);\n");
-  output ("\tg_assert (arity == mono_burg_arity [MBTREE_OP(tree)]);\n\n");
+  output ("\tg_assert (arity == mono_burg_arity [MBTREE_OP(tree)]);\n");
+  output ("\t(void)arity;\n\n");
 
   if (!dag_mode)
     output ("\tp = MBALLOC_STATE;\n");

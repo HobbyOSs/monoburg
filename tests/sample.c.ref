@@ -252,6 +252,7 @@ mono_burg_label_priv (MBTREE_TYPE *tree, MBCOST_DATA *data) {
 
   arity = (left != NULL) + (right != NULL);
   g_assert (arity == mono_burg_arity [MBTREE_OP(tree)]);
+  (void)arity;
 
   p = MBALLOC_STATE;
   memset (p, 0, sizeof (MBState));
