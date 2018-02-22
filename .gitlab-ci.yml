@@ -1,0 +1,10 @@
+debian-stable-gcc:
+  only:
+    - branches
+  image: registry.lrde.epita.fr/monoburg-sid
+  script:
+    - ./bootstrap
+    - ./configure
+    - make -k
+    - make -k check
+    - make -k distcheck
