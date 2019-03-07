@@ -1,6 +1,9 @@
-* New in 1.0.6a:
+* New in 1.0.7:
 
-
+General maintainance:
+  - add support for gitlab-ci
+  - support newer version of GCC
+  - update autotools version
 
 * New in 1.0.6, 2012-03-20:
 

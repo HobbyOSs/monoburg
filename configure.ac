@@ -16,7 +16,7 @@ m4_pattern_forbid([^PKG_])
 
 ## -------------------------------------
 ## Project
-AC_INIT([MonoBURG], [1.0.6a])
+AC_INIT([MonoBURG], [1.0.7])
 AC_CONFIG_HEADERS([config.h])
 
 ## -------------------------------------

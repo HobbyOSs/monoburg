@@ -1,3 +1,120 @@
+2019-03-07  Etienne Renault  <renault@lrde.epita.fr>
+
+	Version 1.0.7.
+
+	* configure.ac: here.
+
+2018-02-22  Etienne Renault  <renault@lrde.epita.fr>
+
+	add support for gitlab-ci
+
+	* .gitlab-ci.yml: here.
+
+2016-11-24  Etienne Renault  <renault@lrde.epita.fr>
+
+	Update to avoid the use of deprecated functions.
+
+	* src/main.c, src/rule.c: here.
+
+2016-11-24  Etienne Renault  <renault@lrde.epita.fr>
+
+	declare static functions as inline to avoid gcc complaints
+
+	*  src/emit.c: here.
+
+2016-11-24  Etienne Renault  <renault@lrde.epita.fr>
+
+	silent gcc unused variable
+
+	* src/emit.c, tests/sample.c.ref: here.
+
+2014-02-12  Roland Levillain  <roland@lrde.epita.fr>
+
+	Teach Git to ignore more files from build-aux/.
+
+2014-01-31  Akim Demaille  <akim@lrde.epita.fr>
+
+	build: ensure that missing Autoconf macros are diagnosed
+
+	* configure.ac: Catch missing PKG_* macros.
+	* Makefile.am (ACLOCAL_AMFLAGS): New.
+	Put macro files in build-aux.
+
+2013-09-23  Roland Levillain  <roland@lrde.epita.fr>
+
+	Add a rule to update ChangeLog using Git commit messages.
+
+	* build-aux/gitlog-to-changelog: New.
+	Imported from Git Gnulib.
+	* .last-cl-gen: New.
+	* Makefile.am (update-ChangeLog): New target.
+	(EXTRA_DIST): Add build-aux/gitlog-to-changelog and .last-cl-gen.
+
+2013-09-23  Roland Levillain  <roland@lrde.epita.fr>
+
+	Require Automake 1.11 instead of 1.12, as Debian 7 ships the former only.
+
+	* configure.ac: Here.
+	Version 1.0.6a.
+	* NEWS: Likewise.
+
+2013-01-21  Akim Demaille  <akim@lrde.epita.fr>
+
+	style: do not generate tabulation in the output
+
+	* src/emit.c (output): Convert tabs to two spaces.
+	* tests/sample.brg, tests/sample.c.ref: Untabify.
+	Remove trailing spaces.
+
+2013-01-21  Akim Demaille  <akim@lrde.epita.fr>
+
+	tests: fix display of results
+
+	* tests/Makefile.am: Display in the correct order.
+	Use diff -u.
+
+2013-01-21  Akim Demaille  <akim@lrde.epita.fr>
+
+	style: formatting changes
+
+	* src/emit_functions.c, src/emit_kids.c: Reindent.
+
+2013-01-21  Akim Demaille  <akim@lrde.epita.fr>
+
+	style: reindent
+
+	* src/emit.c: Indent with two spaces.
+
+2013-01-21  Akim Demaille  <akim@lrde.epita.fr>
+
+	styles: untabify sources
+
+	* src/check.c, src/check.h, src/emit.c, src/emit.h, src/emit_cost.c,
+	* src/emit_files.c, src/emit_functions.c, src/emit_kids.c,
+	* src/emit_pretty_print.c, src/main.c, src/mem_clean.c,
+	* src/mem_clean.h, src/named_subtree.c, src/named_subtree.h,
+	* src/parser.h, src/rule.c, src/rule.h:
+	Untabify.
+
+2013-01-21  Akim Demaille  <akim@lrde.epita.fr>
+
+	build: silent rules
+
+	* configure.ac: Ask for silent builds.
+	Upgrade to AC_CONFIG_HEADERS.
+
+2012-11-30  Akim Demaille  <akim@lrde.epita.fr>
+
+	build: please newer version of glib
+
+	* src/main.c: Include glib.h.
+
+2012-11-30  Akim Demaille  <akim@lrde.epita.fr>
+
+	build: remove generated files
+
+	* INSTALL: Remove.
+
 2012-03-20  Roland Levillain  <roland@lrde.epita.fr>
 
 	Version 1.0.6.
