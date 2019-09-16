@@ -501,7 +501,7 @@ yylex (void)
       unsigned i = 3, d = 1;
       static char buf [100000];
 
-      g_memmove (buf, "\t{\n", 4);
+      memmove (buf, "\t{\n", 4);
       if (lines_p)
         i += sprintf (buf + 3, "#line %d \"%s\"\n", LASTINPUT->yylineno,
 		                  LASTINPUT->filename);
@@ -516,7 +516,7 @@ yylex (void)
             break;
 	      }
       }
-      g_memmove (buf + --i, "\n\t}", 4);
+      memmove (buf + --i, "\n\t}", 4);
       yylval.text = g_strdup (buf);
 
       return CODE;
